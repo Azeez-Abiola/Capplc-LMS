@@ -1,0 +1,145 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Sen:wght@400;500;600;700;800&display=swap');
+
+@theme {
+  --font-sans: 'Sen', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Sen', sans-serif;
+  --color-primary-500: #f26f21;
+  --color-primary-600: #d95d1a;
+  --color-primary-100: #fef1e9;
+  --color-primary-50: #fff9f5;
+  --color-secondary-500: #1A1A1A;
+  --color-secondary-900: #0D0D0D;
+}
+
+:root {
+  --primary: #f26f21;
+  --secondary: #1A1A1A;
+  --bg-main: #F8F9FA;
+  --card-bg: #FFFFFF;
+  --border-color: #E2E8F0;
+  --text-main: #1A1A1A;
+  --text-muted: #64748b;
+}
+
+.dark {
+  --bg-main: #0D0D0D;
+  --card-bg: #1A1A1A;
+  --secondary: #FFFFFF;
+  --border-color: #2D2D2D;
+  --text-main: #F8F9FA;
+  --text-muted: #94a3b8;
+}
+
+@layer base {
+  ::selection {
+    background-color: #f26f21;
+    color: white;
+  }
+  
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+  }
+}
+
+@layer components {
+  /* Structured Card - Refined Geometry & Dark Mode Support */
+  .bento-card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    @apply rounded-lg border shadow-sm transition-all duration-300;
+  }
+
+  .nav-link-pill {
+    @apply px-5 py-2 rounded-md text-sm font-semibold transition-all duration-200;
+  }
+
+  /* Fixed Logo Proportion */
+  .logo-container {
+    @apply flex items-center justify-center overflow-hidden shrink-0;
+  }
+}
+
+/* Universal Text Color Overrides for Dark Mode */
+.dark p, .dark span:not(.text-primary-500), .dark div:not(.bg-primary-500) {
+  /* color: var(--text-main); */
+}
+
+/* Specific text muted for dark mode */
+.dark .text-slate-500, .dark .text-slate-400 {
+  color: var(--text-muted) !important;
+}
+
+.dark .text-secondary-500 {
+  color: var(--text-main) !important;
+}
+
+/* Ensure background of bento cards is forced in dark mode */
+.dark .bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: #262626 !important;
+}
+
+.dark .border-slate-100, .dark .border-slate-200 {
+  border-color: var(--border-color) !important;
+}
+
+#root {
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-200 rounded-full hover:bg-neutral-300 transition-colors;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-neutral-800 hover:bg-neutral-700;
+}
+
+/* Crisp Geometric Divider */
+.divider {
+  background-color: var(--border-color);
+  @apply h-[1px] w-full;
+}
+
+/* Subtle Slide Animation */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
