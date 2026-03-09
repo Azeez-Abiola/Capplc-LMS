@@ -1,4 +1,4 @@
-import { Edit3, Mail, Phone, MapPin, Briefcase, Award, ShieldCheck, ChevronRight, Globe, Lock, Bell, Eye, Loader2, CheckCircle2 } from 'lucide-react'
+import { Edit3, Briefcase, Award, ShieldCheck, Globe, Lock, Bell, Eye, Loader2, CheckCircle2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { authService } from '../../services/authService'
 import { userService } from '../../services/userService'

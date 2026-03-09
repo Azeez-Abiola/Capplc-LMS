@@ -1,4 +1,4 @@
-import { Edit3, Trash2, Play, LayoutGrid, List, ChevronRight, Plus } from 'lucide-react'
+import { Edit3, Trash2, Play, LayoutGrid, List, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 export default function CourseManagement() {
