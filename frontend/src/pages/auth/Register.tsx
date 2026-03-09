@@ -31,8 +31,8 @@ export default function Register() {
         phone: formData.phone,
         state: formData.state
       })
-      toast.success('Registration successful! Please verify your email.')
-      navigate('/verify-email', { state: { email: formData.email } })
+      toast.success('Registration successful! Your account is active.')
+      navigate('/login')
     } catch (error: any) {
       toast.error(error.response?.data?.error || error.message || 'Registration failed')
     } finally {
