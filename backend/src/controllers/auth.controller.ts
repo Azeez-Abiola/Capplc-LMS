@@ -21,7 +21,17 @@ export const register = async (req: Request, res: Response) => {
       }
     })
 
-    if (authError) throw authError
+    if (authError) {
+      console.error('[AUTH_ERROR]', authError)
+      // Custom friendly messages for common Supabase errors
+      if (authError.code === 'over_email_send_rate_limit') {
+        throw new Error('Supabase email limit exceeded. Please try again in an hour or contact the administrator to setup custom SMTP.')
+      }
+      if (authError.code === 'email_already_registered') {
+        throw new Error('This email is already registered. Please sign in instead.')
+      }
+      throw authError
+    }
 
     // 2. The profile is automatically created via the 'on_auth_user_created' 
     // database trigger using the meta_data provided above.
@@ -29,13 +39,15 @@ export const register = async (req: Request, res: Response) => {
     // 3. Send Orientation Email (Transactional, non-blocking)
     if (authData.user) {
       try {
-        await sendEmail({
-          to: email,
-          subject: 'Access Granted: CAP Business Pro',
-          html: `<h1>Welcome, ${first_name}!</h1>
-                 <p>Your professional account is active. You can now access the full LMS suite.</p>
-                 <p>Login here: <a href="http://localhost:3000/login">Business Pro Portal</a></p>`
-        })
+        if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 're_your_api_key_here') {
+          await sendEmail({
+            to: email,
+            subject: 'Access Granted: CAP Business Pro',
+            html: `<h1>Welcome, ${first_name}!</h1>
+                   <p>Your professional account is active. You can now access the full LMS suite.</p>
+                   <p>Login here: <a href="http://localhost:3000/login">Business Pro Portal</a></p>`
+          })
+        }
       } catch (emailError) {
         console.warn('[SILENT_FAIL] Orientation email failed:', emailError)
       }
@@ -46,8 +58,15 @@ export const register = async (req: Request, res: Response) => {
       user: authData.user 
     })
   } catch (error: any) {
-    console.error('[REGISTRATION_ERROR]', error)
-    res.status(400).json({ error: error.message })
+    console.error('[REGISTRATION_ERROR_DETAIL]', {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+    })
+    res.status(error.status || 400).json({ 
+      error: error.message || 'Registration failed',
+      code: error.code
+    })
   }
 }
 

@@ -72,11 +72,9 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
   }
 
   const firstName = user?.user_metadata?.first_name || 'Professional'
-  const painterId = user?.id?.substring(0, 4).toUpperCase() || 'NODE'
 
   return (
-    <nav className="h-20 bg-white dark:bg-white border-b border-primary-500/50 flex items-center sticky top-0 z-[100] transition-all">
-      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-primary-500 shadow-[0_0_10px_rgba(255,94,36,0.3)]" />
+    <nav className="h-20 bg-white border-b-2 border-primary-500 flex items-center sticky top-0 z-[100] transition-all shadow-sm">
       
       <div className="max-w-[1440px] mx-auto w-full px-6 flex items-center justify-between">
         
@@ -86,25 +84,25 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
              <img src="/Capplc-logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <div className="hidden md:block leading-none text-left">
-            <p className="text-lg font-bold tracking-tight text-secondary-500 uppercase leading-none">
+            <p className="text-lg font-bold tracking-tight text-secondary-900 leading-none">
               Business <span className="text-primary-500">Pro</span>
             </p>
-            <p className="text-[8px] font-bold text-slate-400 tracking-[0.2em] mt-1.5 uppercase leading-none">CAP PLC Digital</p>
+            <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-tight leading-none">CAP PLC</p>
           </div>
         </NavLink>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-1.5 p-1 bg-white border border-slate-100 dark:border-white/5 rounded-lg shadow-sm">
+        <div className="hidden lg:flex items-center gap-1">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.to === '/' || item.to === '/admin'}
               className={({ isActive }) =>
-                `px-5 py-2 rounded text-[11px] font-bold uppercase tracking-widest transition-all ${
+                `px-6 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-widest ${
                   isActive
-                    ? 'bg-white text-primary-500 shadow-sm border border-slate-100'
-                    : 'text-slate-400 hover:text-secondary-500'
+                    ? 'bg-secondary-900 text-white shadow-lg'
+                    : 'text-slate-500 hover:text-secondary-900 hover:bg-slate-50'
                 }`
               }
             >
@@ -140,7 +138,7 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
                 <div className="fixed inset-0 z-[110]" onClick={() => setShowNotifications(false)} />
                 <div className="absolute top-[calc(100%+12px)] right-0 w-80 bg-white dark:bg-white rounded-lg shadow-xl border border-slate-200 dark:border-primary-100 overflow-hidden z-[120] animate-slide-up">
                   <div className="p-4 bg-slate-50 dark:bg-slate-50 border-b border-slate-200 dark:border-slate-200 flex justify-between items-center">
-                    <h4 className="text-[10px] font-bold text-secondary-500 uppercase tracking-[0.2em]">PLATFORM NOTIFICATIONS</h4>
+                    <h4 className="text-xs font-bold text-secondary-900">Notifications</h4>
                     <span className="bg-primary-500 text-white text-[8px] px-2 py-0.5 rounded font-bold uppercase">3 New</span>
                   </div>
                   <div className="max-h-[360px] overflow-y-auto no-scrollbar bg-white">
@@ -187,17 +185,17 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
                 <div className="fixed inset-0 z-[110]" onClick={() => setShowProfileMenu(false)} />
                 <div className="absolute top-[calc(100%+12px)] right-0 w-60 bg-white dark:bg-white rounded-lg shadow-2xl border border-slate-200 dark:border-primary-100 p-2 z-[120] animate-slide-up">
                   <div className="p-3 bg-slate-50 dark:bg-slate-50 rounded mb-2 border border-slate-100 dark:border-slate-100 text-left">
-                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1 leading-none">VALIDATED ENTITY</p>
-                     <p className="text-sm font-bold text-secondary-500 truncate">{firstName} Ali (#{painterId})</p>
+                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 leading-none">Account</p>
+                     <p className="text-sm font-bold text-secondary-900 truncate">{firstName} Ali</p>
                   </div>
                   <NavAction icon={<User size={14} />} label="Professional Profile" to="/profile" onClick={() => setShowProfileMenu(false)} />
                   <NavAction icon={<Settings size={14} />} label="System Identity" to="/profile" onClick={() => setShowProfileMenu(false)} />
                   <div className="h-px bg-slate-50 dark:bg-slate-50 my-1 mx-1" />
                   <button 
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-50 rounded text-[10px] uppercase tracking-widest transition-all"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-red-500 font-medium hover:bg-red-50 rounded text-xs transition-all"
                   >
-                    <LogOut size={14} /> FLUSH SESSION
+                    <LogOut size={14} /> Sign Out
                   </button>
                 </div>
               </>
@@ -240,7 +238,7 @@ function NavAction({ icon, label, to, onClick }: { icon: React.ReactNode; label:
     <NavLink 
       to={to} 
       onClick={onClick}
-      className="flex items-center gap-3 px-4 py-3 text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-white/5 hover:text-primary-500 rounded text-[10px] uppercase tracking-widest transition-all text-left"
+      className="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:bg-slate-50 hover:text-primary-500 rounded text-xs transition-all text-left"
     >
       {icon} {label}
     </NavLink>

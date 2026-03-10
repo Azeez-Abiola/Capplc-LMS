@@ -1,15 +1,15 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Sen:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sen:wght@400;500;600;700;800&family=Readex+Pro:wght@200;300;400;500;600;700&display=swap');
 
 @theme {
   --font-sans: 'Sen', ui-sans-serif, system-ui, sans-serif;
-  --font-heading: 'Sen', sans-serif;
+  --font-heading: 'Readex Pro', sans-serif;
   --color-primary-500: #f26f21;
   --color-primary-600: #d95d1a;
   --color-primary-100: #fef1e9;
   --color-primary-50: #fff9f5;
-  --color-secondary-500: #1A1A1A;
-  --color-secondary-900: #0D0D0D;
+  --color-secondary-500: #2D3748;
+  --color-secondary-900: #1A202C;
 }
 
 :root {
@@ -38,28 +38,39 @@
   }
   
   body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
+    background-color: #FFFFFF;
+    color: #0f172a;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
     transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html.dark body {
+    background-color: #020617; /* Slate 950 */
+    color: #f8fafc;
+  }
+
+  html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+    color: #ffffff;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    letter-spacing: -0.02em;
-    color: var(--text-main);
+    color: #1A202C;
+  }
+
+  input, select, textarea {
+    font-weight: 400 !important;
   }
 }
 
 @layer components {
-  /* Structured Card - Refined Geometry & Dark Mode Support */
+  /* Structured Card - Standard Premium Minimalism */
   .bento-card {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
-    @apply rounded-lg border shadow-sm transition-all duration-300;
+    background-color: #FFFFFF;
+    border: 1px solid #F1F5F9;
+    @apply rounded-xl shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary-100;
   }
 
   .nav-link-pill {

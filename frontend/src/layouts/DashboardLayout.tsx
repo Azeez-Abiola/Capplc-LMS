@@ -3,27 +3,36 @@ import TopNav from '../components/navigation/TopNav'
 
 export default function DashboardLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-main)]">
+    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
       <TopNav />
       
       {/* ── CORE CONTENT INFRASTRUCTURE ── */}
-      <main className="flex-1 w-full max-w-[1440px] mx-auto px-6 py-10 relative">
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-10 py-16 relative">
         <div className="absolute top-0 right-0 h-96 w-96 bg-primary-500/5 rounded-full blur-[100px] pointer-events-none" />
         <Outlet />
       </main>
       
       {/* ── SYSTEM FOOTER ── */}
-      <footer className="py-12 border-t border-slate-200 mt-auto bg-white/50 backdrop-blur-md">
-        <div className="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-           <div className="flex flex-col md:flex-row items-center gap-4">
-              <img src="/Capplc-logo.png" alt="CAP Logo" className="h-6 w-auto opacity-60 hover:opacity-100 transition-opacity" />
-              <div className="h-4 w-px bg-slate-200 hidden md:block" />
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">© 2026 CAP PLC • BUSINESS PRO NODE • INFRASTRUCTURE V2.1.0_LATEST</p>
+      <footer className="py-16 border-t border-slate-100 mt-auto bg-white/50 backdrop-blur-md">
+        <div className="max-w-[1440px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-12 text-left">
+           <div className="flex flex-col md:flex-row items-center gap-6">
+              <img src="/Capplc-logo.png" alt="CAP Logo" className="h-8 w-auto opacity-70 hover:opacity-100 transition-all hover:scale-105" />
+              <div className="h-6 w-px bg-slate-200 hidden md:block" />
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">© 2026 CAP PLC • BUSINESS PRO PLATFORM</p>
            </div>
            <div className="flex items-center gap-10">
-              <a href="#" className="text-[9px] font-bold text-slate-400 hover:text-primary-500 transition-colors uppercase tracking-[0.2em]">Data Privacy Protocol</a>
-              <a href="#" className="text-[9px] font-bold text-slate-400 hover:text-primary-500 transition-colors uppercase tracking-[0.2em]">Service SLAs</a>
-              <a href="#" className="text-[9px] font-bold text-slate-400 hover:text-primary-500 transition-colors uppercase tracking-[0.2em]">System Support</a>
+              <a href="#" className="text-[10px] font-bold text-slate-400 hover:text-primary-500 transition-all uppercase tracking-[0.2em] relative group">
+                Privacy Policy
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all group-hover:w-full" />
+              </a>
+              <a href="#" className="text-[10px] font-bold text-slate-400 hover:text-primary-500 transition-all uppercase tracking-[0.2em] relative group">
+                Terms of Service
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all group-hover:w-full" />
+              </a>
+              <a href="#" className="text-[10px] font-bold text-slate-400 hover:text-primary-500 transition-all uppercase tracking-[0.2em] relative group">
+                Support
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all group-hover:w-full" />
+              </a>
            </div>
         </div>
       </footer>

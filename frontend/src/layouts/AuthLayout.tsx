@@ -2,7 +2,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 
 export default function AuthLayout() {
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-white dark:bg-black">
+    <div className="min-h-screen flex flex-col md:flex-row bg-white">
       
       {/* ── LEFT PANEL: BRAND HERO SECTION ── */}
       <div className="hidden md:flex md:w-1/2 relative overflow-hidden items-center justify-center p-20 lg:p-32">
@@ -38,7 +38,7 @@ export default function AuthLayout() {
       </div>
 
       {/* ── RIGHT PANEL: AUTH CONTEXT CONTAINER ── */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-20 relative bg-white dark:bg-black">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-20 relative bg-white">
         <div className="w-full max-w-[420px] animate-slide-up relative z-10">
            
            {/* Mobile Branding */}
@@ -59,7 +59,7 @@ export default function AuthLayout() {
 
         {/* Minimal Footer */}
         <div className="absolute bottom-10 inset-x-0 text-center">
-           <p className="text-[10px] font-bold text-slate-200 dark:text-slate-800 uppercase tracking-[0.5em] leading-none">
+           <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.5em] leading-none">
               © 2026 CAP PLC
            </p>
         </div>

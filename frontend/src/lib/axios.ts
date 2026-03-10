@@ -10,12 +10,16 @@ const api = axios.create({
 // Request interceptor — attach auth token
 api.interceptors.request.use((config) => {
   // Try to find the supabase token in localStorage
-  const supabaseTokenKey = Object.keys(localStorage).find(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+  const supabaseTokenKey = Object.keys(localStorage).find(key => key.includes('auth-token'));
   if (supabaseTokenKey) {
-    const session = JSON.parse(localStorage.getItem(supabaseTokenKey) || '{}');
-    const token = session.access_token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    try {
+      const session = JSON.parse(localStorage.getItem(supabaseTokenKey) || '{}');
+      const token = session.access_token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {
+      console.error('Failed to parse token session', e);
     }
   }
   return config;
@@ -26,7 +30,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // In a real app, you might want to trigger a logout or refresh the token
+       // Clear session if unauthorized to avoid loop
+       // window.location.href = '/login'; 
     }
     return Promise.reject(error)
   }
