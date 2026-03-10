@@ -1,4 +1,4 @@
-import { Play, CheckCircle2, Award, Clock, ArrowRight, Bell, Layout, BookOpen, Settings, Loader2, Target, Zap, Shield } from 'lucide-react'
+import { Play, CheckCircle2, Award, Clock, ArrowRight, Layout, BookOpen, Loader2, Target, Zap, Shield } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { analyticsService } from '../../services/analyticsService'
