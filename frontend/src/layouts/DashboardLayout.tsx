@@ -7,14 +7,14 @@ export default function DashboardLayout() {
       <TopNav />
       
       {/* ── CORE CONTENT INFRASTRUCTURE ── */}
-      <main className="flex-1 w-full max-w-[1440px] mx-auto px-10 py-16 relative">
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-10 py-8 md:py-16 relative">
         <div className="absolute top-0 right-0 h-96 w-96 bg-primary-500/5 rounded-full blur-[100px] pointer-events-none" />
         <Outlet />
       </main>
       
       {/* ── SYSTEM FOOTER ── */}
-      <footer className="py-16 border-t border-slate-100 mt-auto bg-white/50 backdrop-blur-md">
-        <div className="max-w-[1440px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-12 text-left">
+      <footer className="py-8 md:py-16 border-t border-slate-100 mt-auto bg-white/50 backdrop-blur-md">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col md:flex-row justify-between items-center gap-8 md:gap-12 text-left">
            <div className="flex flex-col md:flex-row items-center gap-6">
               <img src="/Capplc-logo.png" alt="CAP Logo" className="h-8 w-auto opacity-70 hover:opacity-100 transition-all hover:scale-105" />
               <div className="h-6 w-px bg-slate-200 hidden md:block" />

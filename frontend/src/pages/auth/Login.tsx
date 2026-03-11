@@ -53,7 +53,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@example.com"
-                className="w-full bg-slate-50 border border-slate-200 rounded-3xl py-2.5 pl-14 pr-6 text-sm font-medium text-secondary-900 placeholder:text-slate-200 focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all outline-none" 
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-14 pr-6 text-sm font-medium text-secondary-900 placeholder:text-slate-200 focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all outline-none" 
               />
            </div>
         </div>
@@ -73,7 +73,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-slate-50 border border-slate-200 rounded-3xl py-2.5 pl-14 pr-14 text-sm font-medium text-secondary-900 placeholder:text-slate-200 focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all outline-none" 
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-14 pr-14 text-sm font-medium text-secondary-900 placeholder:text-slate-200 focus:ring-4 focus:ring-primary-50 focus:border-primary-500 transition-all outline-none" 
               />
               <button 
                 type="button" 
@@ -88,7 +88,7 @@ export default function Login() {
         <button 
           type="submit"
           disabled={loading}
-          className="w-full py-4 bg-secondary-900 text-white font-bold rounded-3xl shadow-xl hover:bg-black transition-all text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-4 bg-secondary-900 text-white font-bold rounded-xl shadow-xl hover:bg-black transition-all text-xs uppercase tracking-[0.2em] flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
            {loading ? <Loader2 size={18} className="animate-spin" /> : <>Sign In <ArrowRight size={18} /></>}
         </button>

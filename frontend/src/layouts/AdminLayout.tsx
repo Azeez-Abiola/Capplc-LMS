@@ -8,13 +8,13 @@ export default function AdminLayout() {
       <TopNav isAdmin={true} />
       
       {/* ── ADMIN CORE INFRASTRUCTURE ── */}
-      <main className="flex-1 w-full max-w-[1440px] mx-auto px-10 py-16 relative">
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-10 py-8 md:py-16 relative">
         <Outlet />
       </main>
       
       {/* ── INTERNAL SYSTEM FOOTER ── */}
-      <footer className="py-16 border-t border-slate-100 mt-auto bg-white">
-        <div className="max-w-[1440px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-10">
+      <footer className="py-8 md:py-16 border-t border-slate-100 mt-auto bg-white">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col md:flex-row justify-between items-center gap-8 md:gap-10">
            <div className="flex items-center gap-5 group">
               <div className="h-10 w-10 bg-secondary-900 rounded-xl flex items-center justify-center p-2 shadow-xl group-hover:scale-110 transition-transform">
                  <img src="/Capplc-logo.png" alt="CAP Logo" className="brightness-0 invert h-full w-auto object-contain" />

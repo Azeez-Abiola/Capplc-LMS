@@ -111,7 +111,7 @@ export default function Register() {
                 name="state"
                 value={formData.state}
                 onChange={handleInputChange}
-                className="w-full bg-slate-50 border border-slate-200 rounded-3xl pl-14 pr-6 py-2.5 text-sm font-medium focus:ring-4 focus:ring-primary-50 focus:border-primary-500 outline-none transition-all appearance-none cursor-pointer text-secondary-900 uppercase tracking-tight"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-14 pr-6 py-2.5 text-sm font-medium focus:ring-4 focus:ring-primary-50 focus:border-primary-500 outline-none transition-all appearance-none cursor-pointer text-secondary-900 uppercase tracking-tight"
               >
                  <option value="Lagos">Lagos</option>
                  <option value="Abuja">Abuja</option>
@@ -145,7 +145,7 @@ export default function Register() {
         <button 
           type="submit"
           disabled={loading}
-          className="w-full bg-secondary-900 text-white font-bold py-4 rounded-3xl shadow-xl hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 group text-xs uppercase tracking-[0.2em] shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-secondary-900 text-white font-bold py-4 rounded-xl shadow-xl hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 group text-xs uppercase tracking-[0.2em] shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? <Loader2 size={18} className="animate-spin" /> : <>Complete Enrollment <ArrowRight size={18} /></>}
         </button>
@@ -180,7 +180,7 @@ function InputGroup({ label, icon, placeholder, name, value, onChange, type = 't
           onChange={onChange}
           required={required}
           placeholder={placeholder}
-          className={`w-full bg-slate-50 border border-slate-200 rounded-3xl pl-14 ${isPassword ? 'pr-14' : 'pr-6'} py-2.5 text-sm font-medium focus:ring-4 focus:ring-primary-50 focus:border-primary-500 outline-none transition-all text-secondary-900 placeholder:text-slate-200 tracking-tight`}
+          className={`w-full bg-slate-50 border border-slate-200 rounded-xl pl-14 ${isPassword ? 'pr-14' : 'pr-6'} py-2.5 text-sm font-medium focus:ring-4 focus:ring-primary-50 focus:border-primary-500 outline-none transition-all text-secondary-900 placeholder:text-slate-200 tracking-tight`}
         />
         {isPassword && togglePassword && (
           <button 

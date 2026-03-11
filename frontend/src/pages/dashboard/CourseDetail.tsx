@@ -61,7 +61,7 @@ export default function CourseDetail() {
          />
          <div className="absolute inset-0 bg-gradient-to-t from-secondary-900 via-secondary-900/40 to-transparent" />
          
-         <div className="relative p-8 sm:p-12 flex flex-col md:flex-row md:items-end justify-between gap-8 h-full pt-16">
+         <div className="relative p-6 md:p-12 flex flex-col md:flex-row md:items-end justify-between gap-8 h-full pt-16">
             <div className="max-w-3xl space-y-6 text-left">
                <div className="flex gap-2">
                   <span className="bg-primary-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg">Featured</span>
@@ -98,7 +98,7 @@ export default function CourseDetail() {
          
          {/* Main Content */}
          <div className="lg:col-span-8 space-y-10 text-left">
-            <div className="bg-white p-8 sm:p-10 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+            <div className="bg-white p-6 md:p-10 rounded-2xl border border-slate-100 shadow-sm space-y-6">
                <h2 className="text-lg font-bold text-secondary-900 tracking-tight flex items-center gap-3">
                   <div className="h-1.5 w-6 bg-primary-500 rounded-full" /> 
                   About this Course
@@ -123,7 +123,7 @@ export default function CourseDetail() {
                </div>
             </div>
 
-            <div className="bg-white p-8 sm:p-10 rounded-2xl border border-slate-100 shadow-sm space-y-8">
+            <div className="bg-white p-6 md:p-10 rounded-2xl border border-slate-100 shadow-sm space-y-8">
                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <h2 className="text-lg font-bold text-secondary-900 tracking-tight flex items-center gap-3">
                      <div className="h-1.5 w-6 bg-secondary-900 rounded-full" /> 
@@ -166,7 +166,7 @@ export default function CourseDetail() {
 
          {/* Sidebar */}
          <div className="lg:col-span-4 space-y-10">
-            <div className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden text-center group">
+            <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden text-center group">
                <div className="absolute top-0 inset-x-0 h-1 bg-secondary-900 group-hover:bg-primary-500 transition-colors" />
                <div className="h-28 w-28 rounded-full bg-slate-50 mx-auto mb-6 border-4 border-white shadow-xl overflow-hidden mt-4">
                   <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop" alt="Instructor" className="w-full h-full object-cover transition-all duration-500" />

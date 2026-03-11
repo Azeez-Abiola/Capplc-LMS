@@ -53,7 +53,7 @@ export default function Dashboard() {
       {/* Welcome & Progress Section */}
       <div className="flex flex-col lg:flex-row gap-8 items-stretch text-left">
         {/* Main Welcome Hero */}
-        <div className="flex-1 p-8 bg-white rounded-2xl relative overflow-hidden group border border-slate-100 shadow-sm transition-all flex flex-col justify-between">
+        <div className="flex-1 p-6 md:p-8 bg-white rounded-2xl relative overflow-hidden group border border-slate-100 shadow-sm transition-all flex flex-col justify-between">
            <div className="absolute top-0 right-0 h-full w-1/2 bg-gradient-to-l from-primary-50/50 to-transparent pointer-events-none" />
            
            <div className="relative z-10 flex flex-col justify-between h-full space-y-8">
@@ -81,7 +81,7 @@ export default function Dashboard() {
         </div>
 
         {/* Actionable Goal Card */}
-        <div className="lg:w-80 p-8 bg-secondary-900 rounded-2xl relative overflow-hidden flex flex-col justify-between group shadow-sm">
+        <div className="w-full lg:w-80 p-6 md:p-8 bg-secondary-900 rounded-2xl relative overflow-hidden flex flex-col justify-between group shadow-sm">
            <div className="absolute -top-10 -right-10 h-32 w-32 bg-primary-500/20 rounded-full blur-2xl group-hover:bg-primary-500/30 transition-colors pointer-events-none" />
            <div className="relative z-10 space-y-6">
               <div className="flex justify-between items-start">
@@ -109,7 +109,7 @@ export default function Dashboard() {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
          <StatTile icon={<Layout size={20} />} label="Enrolled Courses" value={stats?.enrolledCourses.toString() || "0"} color="text-blue-500" />
          <StatTile icon={<Zap size={20} />} label="Active Sessions" value="02" color="text-primary-500" />
          <StatTile icon={<CheckCircle2 size={20} />} label="Courses Completed" value={stats?.completedCourses.toString() || "0"} color="text-green-500" />
@@ -132,7 +132,7 @@ export default function Dashboard() {
                  { title: 'Luxury Texture Portfolio: Advanced Tech', color: 'bg-secondary-900', progress: 24, duration: '4h 30m remaining', type: 'ELITE' },
                  { title: 'Color Mixology for Interior Diagnostics', color: 'bg-blue-500', progress: 8, duration: '5h 00m remaining', type: 'PRO' },
                ].map((track, i) => (
-                 <div key={i} className="p-6 bg-white border border-slate-100 rounded-2xl flex flex-col sm:flex-row sm:items-center gap-5 group hover:shadow-md transition-all shadow-sm">
+                 <div key={i} className="p-5 md:p-6 bg-white border border-slate-100 rounded-2xl flex flex-col sm:flex-row sm:items-center gap-5 group hover:shadow-md transition-all shadow-sm">
                     <div className="flex-1 space-y-4 text-left w-full">
                        <div className="flex items-center justify-between">
                           <span className={`px-2 py-1 bg-slate-50 border border-slate-100 rounded text-[8px] font-bold uppercase tracking-[0.2em] ${track.type === 'ELITE' ? 'text-primary-500' : 'text-slate-500'}`}>{track.type} Track</span>

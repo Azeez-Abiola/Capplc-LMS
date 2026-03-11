@@ -73,7 +73,7 @@ export default function MyCourses() {
            <button 
              key={tab} 
              onClick={() => setActiveTab(tab)}
-             className={`px-8 py-2.5 text-xs font-bold transition-all rounded-xl uppercase tracking-widest ${activeTab === tab ? 'bg-white text-primary-500 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-secondary-900'}`}
+             className={`px-4 sm:px-8 py-2.5 text-[10px] sm:text-xs flex-1 sm:flex-none text-center font-bold transition-all rounded-xl uppercase tracking-widest ${activeTab === tab ? 'bg-white text-primary-500 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-secondary-900'}`}
            >
              {tab}
            </button>

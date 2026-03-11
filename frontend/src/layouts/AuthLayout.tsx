@@ -38,7 +38,7 @@ export default function AuthLayout() {
       </div>
 
       {/* ── RIGHT PANEL: AUTH CONTEXT CONTAINER ── */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-20 relative bg-white">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 md:p-20 relative bg-white">
         <div className="w-full max-w-[420px] animate-slide-up relative z-10">
            
            {/* Mobile Branding */}
