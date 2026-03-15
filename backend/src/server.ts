@@ -47,19 +47,20 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use('/auth', authRoutes)
-app.use('/courses', courseRoutes)
-app.use('/modules', moduleRoutes)
-app.use('/videos', videoRoutes)
-app.use('/progress', progressRoutes)
-app.use('/webhooks', webhookRoutes)
-app.use('/subscriptions', subscriptionRoutes)
-app.use('/payments', paymentRoutes)
-app.use('/certificates', certificateRoutes)
-app.use('/users', userRoutes)
-app.use('/analytics', analyticsRoutes)
-app.use('/super-admin', superAdminRoutes)
-app.use('/notifications', notificationRoutes)
+// Routes
+app.use('/api/auth', authRoutes)
+app.use('/api/courses', courseRoutes)
+app.use('/api/modules', moduleRoutes)
+app.use('/api/videos', videoRoutes)
+app.use('/api/progress', progressRoutes)
+app.use('/api/webhooks', webhookRoutes)
+app.use('/api/subscriptions', subscriptionRoutes)
+app.use('/api/payments', paymentRoutes)
+app.use('/api/certificates', certificateRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/analytics', analyticsRoutes)
+app.use('/api/super-admin', superAdminRoutes)
+app.use('/api/notifications', notificationRoutes)
 
 // Test route
 app.get('/test-api', (req, res) => {
@@ -67,7 +68,7 @@ app.get('/test-api', (req, res) => {
 })
 
 // Health check
-app.get('/health', (_req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
