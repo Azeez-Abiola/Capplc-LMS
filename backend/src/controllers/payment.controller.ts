@@ -73,7 +73,7 @@ export const getPaymentHistory = async (req: Request, res: Response) => {
 
     const { data, error } = await supabase
       .from('payments')
-      .select('*, subscription_tiers(name)')
+      .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
@@ -82,5 +82,27 @@ export const getPaymentHistory = async (req: Request, res: Response) => {
     res.json(data)
   } catch (error: any) {
     res.status(500).json({ error: error.message })
+  }
+}
+
+export const getAllPaymentsMonitor = async (req: Request, res: Response) => {
+  try {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*, profiles(first_name, last_name, email)')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('[PAYMENT_ERROR] Get All Payments:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
+      throw error
+    }
+    res.json(data)
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'Platform database error' })
   }
 }

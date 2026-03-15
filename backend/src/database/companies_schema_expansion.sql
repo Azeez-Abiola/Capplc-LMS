@@ -1,0 +1,7 @@
+-- ADD MISSING FIELDS TO COMPANIES TABLE
+ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS official_email TEXT;
+ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS official_phone TEXT;
+ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS address TEXT;
+
+-- REFRESH SCHEMA CACHE
+NOTIFY pgrst, 'reload schema';

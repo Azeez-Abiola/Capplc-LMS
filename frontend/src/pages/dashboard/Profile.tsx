@@ -1,52 +1,57 @@
-import { Edit3, Briefcase, Award, ShieldCheck, Globe, Lock, Bell, Eye, Loader2, CheckCircle2 } from 'lucide-react'
+import { Edit3, Briefcase, Award, ShieldCheck, Globe, Lock, Bell, Eye, CheckCircle2 } from 'lucide-react'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { useState, useEffect } from 'react'
-import { authService } from '../../services/authService'
+import { useAuth } from '../../hooks/useAuth'
+import { useNavigate } from 'react-router-dom'
 import { userService } from '../../services/userService'
 import { toast } from 'react-hot-toast'
 
 export default function Profile() {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications'>('profile')
-  const [user, setUser] = useState<any>(null)
+  const { user, profile, loading: authLoading, refreshProfile } = useAuth()
   const [loading, setLoading] = useState(true)
-  const [formData, setFormData] = useState({ first_name: '', last_name: '', email: '', phone: '', specialization: '', location: '' })
+  const [formData, setFormData] = useState({ 
+    first_name: '', 
+    last_name: '', 
+    email: '', 
+    phone: '', 
+    specialty: '', 
+    city: '' 
+  })
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await authService.getCurrentUser()
-        setUser(data)
-        setFormData({
-          first_name: data?.user_metadata?.first_name || '',
-          last_name: data?.user_metadata?.last_name || '',
-          email: data?.email || '',
-          phone: data?.user_metadata?.phone || '',
-          specialization: data?.user_metadata?.specialization || 'Luxury Residential',
-          location: data?.user_metadata?.location || 'Lagos, Nigeria',
-        })
-      } catch (error) {
-        console.error('Profile fetch error:', error)
-      } finally {
-        setLoading(false)
-      }
+    // Role-based redirection safeguard
+    if (!authLoading && profile) {
+      // Allow the component to load for all registered roles (Painter, Admin, Super Admin)
+      // Populate formData if profile is available
+      setFormData({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        email: user?.email || '',
+        phone: profile.phone || '',
+        specialty: profile.specialty || 'Luxury Residential',
+        city: profile.city || 'Lagos, Nigeria',
+      })
+      setLoading(false)
+    } else if (!authLoading && !profile) {
+      setLoading(false)
     }
-    fetchProfile()
-  }, [])
+  }, [profile, user, authLoading, navigate])
 
   const handleUpdateProfile = async () => {
     try {
       await userService.updateProfile(formData)
+      await refreshProfile()
       toast.success('Profile updated successfully')
     } catch (error) {
       toast.error('Failed to update profile')
     }
   }
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
-      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 size={32} className="animate-spin text-primary-500" />
-        <p className="text-xs font-medium text-slate-400">Loading your profile...</p>
-      </div>
+      <LogoLoader fullscreen />
     )
   }
 
@@ -79,7 +84,7 @@ export default function Profile() {
                </div>
             </div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-2xl font-medium">
-              Professional painter specialized in {formData.specialization.toLowerCase()} projects based in {formData.location}.
+              Professional painter specialized in {formData.specialty.toLowerCase()} projects based in {formData.city}.
             </p>
          </div>
       </div>
@@ -119,10 +124,10 @@ export default function Profile() {
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <DetailGroup label="First Name" value={formData.first_name} onChange={(v) => setFormData({...formData, first_name: v})} />
                     <DetailGroup label="Last Name" value={formData.last_name} onChange={(v) => setFormData({...formData, last_name: v})} />
-                    <DetailGroup label="Email Address" value={formData.email} type="email" onChange={(v) => setFormData({...formData, email: v})} />
+                    <DetailGroup label="Email Address" value={formData.email} type="email" isStatic />
                     <DetailGroup label="Phone Number" value={formData.phone} onChange={(v) => setFormData({...formData, phone: v})} />
-                    <DetailGroup label="Specialization" value={formData.specialization} onChange={(v) => setFormData({...formData, specialization: v})} />
-                    <DetailGroup label="Location" value={formData.location} onChange={(v) => setFormData({...formData, location: v})} />
+                    <DetailGroup label="Specialization" value={formData.specialty} onChange={(v) => setFormData({...formData, specialty: v})} />
+                    <DetailGroup label="Location" value={formData.city} onChange={(v) => setFormData({...formData, city: v})} />
                  </div>
 
                  <div className="pt-6 border-t border-slate-50 flex gap-4">
@@ -214,13 +219,7 @@ export default function Profile() {
                   </div>
                </div>
             </div>
-
-            <div className="bg-red-50 p-8 rounded-2xl border border-red-100">
-               <h4 className="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-4">Danger Zone</h4>
-               <button className="w-full py-3 border border-red-200 text-red-500 text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-red-600 hover:text-white hover:border-red-600 transition-all active:scale-[0.98]">
-                  Delete Account
-               </button>
-            </div>
+            {/* Danger Zone Removed */}
          </div>
 
       </div>

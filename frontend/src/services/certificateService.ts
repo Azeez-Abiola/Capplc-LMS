@@ -21,5 +21,10 @@ export const certificateService = {
   async verifyCertificate(serialNo: string): Promise<Certificate> {
     const { data } = await api.get(`certificates/verify/${serialNo}`)
     return data
+  },
+
+  async getAllCertificatesAdmin(): Promise<any[]> {
+    const { data } = await api.get('certificates/admin/all')
+    return data
   }
 }

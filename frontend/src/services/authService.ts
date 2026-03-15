@@ -1,32 +1,41 @@
-import api from '../lib/axios'
-import { supabase } from '../lib/supabase'
+import api, { clearSessionCache, setTempToken } from '../lib/axios'
+import { supabase, safeSetSession } from '../lib/supabase'
 
 export const authService = {
   async register(email: string, password: string, metadata: Record<string, any>) {
     const response = await api.post('auth/register', { 
       email, 
       password, 
-      first_name: metadata.first_name,
-      last_name: metadata.last_name,
-      phone: metadata.phone,
-      state: metadata.state
+      ...metadata
     })
     return response.data
   },
 
   async login(email: string, password: string) {
     const response = await api.post('auth/login', { email, password })
-    // The backend returns a session/token. We should still sync with supabase client if needed
-    // or just store the token. For now, let's assume the backend returns what we need.
     if (response.data.session) {
-      await supabase.auth.setSession(response.data.session)
+      clearSessionCache() // Clear cache so next request gets new session
+      setTempToken(response.data.session.access_token)
+      
+      // Fire and forget setSession to avoid blocking on lock acquisition (5s)
+      // The AuthContext listener will pick it up, and axios uses tempToken for now.
+      safeSetSession(response.data.session).catch(err => {
+        console.warn('[AUTH] Background safeSetSession warning:', err)
+      })
     }
     return response.data
   },
 
   async logout() {
-    await api.post('auth/logout')
-    await supabase.auth.signOut()
+    clearSessionCache()
+    try {
+      // Inform backend but don't wait for it
+      api.post('auth/logout').catch(() => {});
+      // Sign out locally
+      await supabase.auth.signOut()
+    } catch (err) {
+      console.warn('[AUTH] Logout warning:', err)
+    }
   },
 
   async resetPassword(email: string) {

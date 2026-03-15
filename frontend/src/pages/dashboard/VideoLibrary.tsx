@@ -1,32 +1,36 @@
-import { Play, Search, Filter, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import { Play, Search, Filter, CheckCircle2, ChevronRight } from 'lucide-react'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { courseService } from '../../services/courseService'
+import { subscriptionService } from '../../services/subscriptionService'
 
-const videoCategories = ['Fundamental Skills', 'Luxury Residential', 'Industrial Coating', 'Color Theory', 'Safety Protocols']
+// Categories are now derived dynamically from course levels
+
 
 export default function VideoLibrary() {
   const [activeCategory, setActiveCategory] = useState('All Videos')
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeFilter, setActiveFilter] = useState('All')
   const [courses, setCourses] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [tier, setTier] = useState<string>('Free')
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const data = await courseService.getCourses()
+        const [data, sub] = await Promise.all([
+          courseService.getCourses(),
+          subscriptionService.getCurrentSubscription().catch(() => null)
+        ])
         setCourses(Array.isArray(data) ? data : [])
+        if (sub?.tier === 'ELITE') setTier('Premium');
+        else if (sub?.tier === 'PRO') setTier('Advanced');
+        else setTier('Beginners');
       } catch (error) {
         console.error('Video library error:', error)
-        setCourses([
-          { id: 1, title: 'Mastering Surface Prep: The CAP Standard', duration: '1h 45m', type: 'Fundamental Skills', progress: 100, img: 'https://images.unsplash.com/photo-1562259946-08c513d3042c?auto=format&fit=crop&q=80&w=2070' },
-          { id: 2, title: 'Luxury Finishes: Part 1 - Silk Effects', duration: '2h 10m', type: 'Luxury Residential', progress: 40, img: 'https://images.unsplash.com/photo-1589939705384-5185138a04b9?auto=format&fit=crop&q=80&w=2070' },
-          { id: 3, title: 'Advanced Airless Spraying Systems', duration: '3h 15m', type: 'Industrial Coating', progress: 15, img: 'https://images.unsplash.com/photo-1595841055318-502a55099399?auto=format&fit=crop&q=80&w=2070' },
-          { id: 4, title: 'The Chemistry of Epoxy Floor Coating', duration: '4h 00m', type: 'Industrial Coating', progress: 0, img: 'https://images.unsplash.com/photo-1503387762-592dee58c460?auto=format&fit=crop&q=80&w=2070' },
-          { id: 5, title: 'Exterior Weatherproofing Mastery', duration: '2h 45m', type: 'Safety Protocols', progress: 0, img: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&q=80&w=2070' },
-          { id: 6, title: 'Safety Gear & OSHE Standards', duration: '1h 20m', type: 'Safety Protocols', progress: 95, img: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=2070' },
-        ])
+        setCourses([])
       } finally {
         setLoading(false)
       }
@@ -34,10 +38,20 @@ export default function VideoLibrary() {
     fetchCourses()
   }, [])
 
+  const videoCategories = Array.from(new Set(courses.map(c => c.level).filter(Boolean))) as string[]
+
+
   const filteredVideos = (Array.isArray(courses) ? courses : []).filter(video => {
-    const matchesCategory = activeCategory === 'All Videos' || video.type === activeCategory
+    const matchesCategory = activeCategory === 'All Videos' || (video.level || '').toLowerCase() === activeCategory.toLowerCase()
+
     const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
+    
+    let matchesFilter = true;
+    if (activeFilter === 'Completed') matchesFilter = video.progress === 100 || video.status === 'completed';
+    if (activeFilter === 'In Progress') matchesFilter = video.progress > 0 && video.progress < 100;
+    if (activeFilter === 'Not Started') matchesFilter = !video.progress || video.progress === 0;
+
+    return matchesCategory && matchesSearch && matchesFilter
   })
 
   return (
@@ -46,10 +60,13 @@ export default function VideoLibrary() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
         <div className="space-y-1 text-left">
-          <h1 className="text-2xl font-bold tracking-tight text-secondary-900 leading-none">Video Library</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-secondary-900 leading-none">Available Courses</h1>
           <p className="text-slate-500 text-sm font-medium">Browse our collection of on-demand recordings.</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto items-center">
+           <div className="px-4 py-2 bg-primary-50 border border-primary-100 rounded-xl text-[10px] font-bold text-primary-500 uppercase tracking-widest self-start sm:self-auto hidden md:block">
+              Plan: {tier}
+           </div>
            <div className="bg-white border border-slate-200 rounded-xl flex items-center px-4 py-2.5 shadow-sm group focus-within:ring-4 focus-within:ring-primary-50 focus-within:border-primary-500 transition-all flex-1 sm:flex-none">
               <Search size={18} className="text-slate-400 group-focus-within:text-primary-500" />
               <input 
@@ -60,9 +77,21 @@ export default function VideoLibrary() {
                 className="bg-transparent border-none outline-none text-sm font-medium ml-2 w-full sm:w-48 text-secondary-900 placeholder:text-slate-300 tracking-tight" 
               />
            </div>
-           <button className="h-11 w-full sm:w-11 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:text-primary-500 transition-all shadow-sm">
-             <Filter size={18} />
-           </button>
+           <div className="relative shrink-0">
+              <select 
+                value={activeFilter}
+                onChange={(e) => setActiveFilter(e.target.value)}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              >
+                 <option value="All">All Statuses</option>
+                 <option value="Completed">Completed</option>
+                 <option value="In Progress">In Progress</option>
+                 <option value="Not Started">Not Started</option>
+              </select>
+              <button className={`h-11 w-full sm:w-11 bg-white border border-slate-200 rounded-xl flex items-center justify-center transition-all shadow-sm ${activeFilter !== 'All' ? 'text-primary-500 border-primary-500 bg-primary-50' : 'text-slate-400 hover:text-primary-500'}`}>
+                <Filter size={18} />
+              </button>
+           </div>
         </div>
       </div>
 
@@ -88,7 +117,7 @@ export default function VideoLibrary() {
       {/* Grid */}
       {loading ? (
         <div className="py-20 flex flex-col items-center justify-center space-y-4">
-           <Loader2 size={32} className="animate-spin text-primary-500" />
+           <LogoLoader />
            <p className="text-xs font-medium text-slate-400">Searching library...</p>
         </div>
       ) : (

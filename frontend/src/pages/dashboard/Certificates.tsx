@@ -1,8 +1,10 @@
-import { Award, Download, ShieldCheck, Star, Calendar, ChevronRight, ExternalLink, Loader2 } from 'lucide-react'
+import { Award, Download, ShieldCheck, Star, Calendar, ChevronRight, ExternalLink } from 'lucide-react'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { useState, useEffect } from 'react'
 import { certificateService } from '../../services/certificateService'
 import type { Certificate } from '../../services/certificateService'
 import { authService } from '../../services/authService'
+import { toast } from 'react-hot-toast'
 
 export default function Certificates() {
   const [certs, setCerts] = useState<Certificate[]>([])
@@ -30,10 +32,7 @@ export default function Certificates() {
 
   if (loading) {
      return (
-       <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-         <Loader2 size={32} className="animate-spin text-primary-500" />
-         <p className="text-xs font-medium text-slate-400">Loading certificates...</p>
-       </div>
+       <LogoLoader fullscreen />
      )
   }
 
@@ -91,14 +90,23 @@ export default function Certificates() {
                     </p>
                  </div>
                  
-                 <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
-                    <button className="h-14 w-full sm:w-auto px-10 bg-white text-secondary-900 rounded-xl font-bold text-xs hover:bg-slate-100 transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95 uppercase tracking-widest">
+                  <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
+                    <button 
+                      onClick={() => window.open(latestCert.certificate_url, '_blank')}
+                      className="h-14 w-full sm:w-auto px-10 bg-white text-secondary-900 rounded-xl font-bold text-xs hover:bg-slate-100 transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95 uppercase tracking-widest"
+                    >
                        <Download size={18} /> Download PDF
                     </button>
-                    <button className="h-14 w-full sm:w-auto px-10 bg-white/10 text-white rounded-xl font-bold text-xs hover:bg-white/20 transition-all flex items-center justify-center gap-3 border border-white/10 active:scale-95 uppercase tracking-widest">
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(latestCert.certificate_url)
+                        toast.success('Link copied to clipboard')
+                      }}
+                      className="h-14 w-full sm:w-auto px-10 bg-white/10 text-white rounded-xl font-bold text-xs hover:bg-white/20 transition-all flex items-center justify-center gap-3 border border-white/10 active:scale-95 uppercase tracking-widest"
+                    >
                        <ExternalLink size={18} /> Share Link
                     </button>
-                 </div>
+                  </div>
               </div>
            </div>
            <div className="absolute top-0 right-0 h-[400px] w-[400px] bg-primary-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
@@ -113,9 +121,12 @@ export default function Certificates() {
                  <div className="h-14 w-14 bg-slate-50 rounded-2xl flex items-center justify-center text-primary-500 border border-slate-50 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-sm">
                    <ShieldCheck size={28} />
                  </div>
-                 <button className="h-12 w-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary-500 hover:border-primary-500 transition-all active:scale-95 shadow-sm">
-                    <Download size={18} />
-                 </button>
+                  <button 
+                    onClick={() => window.open(cert.certificate_url, '_blank')}
+                    className="h-12 w-12 bg-white rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary-500 hover:border-primary-500 transition-all active:scale-95 shadow-sm"
+                  >
+                     <Download size={18} />
+                  </button>
               </div>
               <div className="space-y-8">
                  <div className="space-y-3">

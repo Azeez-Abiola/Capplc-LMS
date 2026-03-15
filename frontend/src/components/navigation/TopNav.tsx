@@ -1,93 +1,119 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { Bell, User, LogOut, Settings, Menu, X, ChevronDown, CheckCircle2, AlertCircle, Moon, Sun } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
+import { Bell, User, LogOut, Menu, X, ChevronDown, CheckCircle2, AlertCircle, Moon, Sun } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { authService } from '../../services/authService'
+import { useAuth } from '../../hooks/useAuth'
 import { toast } from 'react-hot-toast'
+import { notificationService, type Notification } from '../../services/notificationService'
 
-interface NavItem {
-  to: string;
-  label: string;
-}
-
-const userNavItems: NavItem[] = [
-  { to: '/', label: 'Overview' },
-  { to: '/my-courses', label: 'My Courses' },
-  { to: '/video-library', label: 'Video Library' },
-  { to: '/certificates', label: 'Certificates' },
-  { to: '/subscription', label: 'Subscription' },
-]
+// variant = 'user' (Painter), 'admin' (Company Admin), 'super-admin' (CAP Plc Super Admin)
+type NavVariant = 'user' | 'admin' | 'super-admin'
 
 interface TopNavProps {
-  isAdmin?: boolean;
+  variant?: NavVariant
 }
 
-export default function TopNav({ isAdmin = false }: TopNavProps) {
+export default function TopNav({ variant = 'user' }: TopNavProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const navigate = useNavigate()
-  
-  const navItems = isAdmin ? [
-    { to: '/admin', label: 'Overview' },
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const { user, profile, signOut } = useAuth()
+
+  // Strictly separated nav items per dashboard variant
+  const navItems = variant === 'super-admin' ? [
+    { to: '/super-admin', label: 'Dashboard' },
+    { to: '/super-admin/companies', label: 'Companies' },
+    { to: '/super-admin/revenue', label: 'Revenue' },
+    { to: '/super-admin/analytics', label: 'Analytics' },
+  ] : variant === 'admin' ? [
+    { to: '/admin', label: 'Dashboard' },
     { to: '/admin/users', label: 'Users' },
     { to: '/admin/courses', label: 'Courses' },
     { to: '/admin/payments', label: 'Payments' },
     { to: '/admin/analytics', label: 'Analytics' },
     { to: '/admin/certificates', label: 'Certificates' },
-  ] : userNavItems;
+  ] : [
+    { to: '/dashboard', label: 'Dashboard' },
+    { to: '/my-courses', label: 'My courses' },
+    { to: '/video-library', label: 'Available courses' },
+    { to: '/certificates', label: 'Certificates' },
+    { to: '/subscription', label: 'Subscription' },
+  ];
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await authService.getCurrentUser()
-        setUser(userData)
-      } catch (error) {
-        console.error('Failed to fetch user:', error)
-      }
-    }
-    fetchUser()
-  }, [])
+    const handleOpenNotif = () => {
+      setShowNotifications(true);
+      setShowProfileMenu(false);
+    };
+    window.addEventListener('openNotifications', handleOpenNotif);
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout()
-      toast.success('Logged out successfully')
-      navigate('/login')
-    } catch (error) {
-      toast.error('Logout failed')
+    if (user) {
+      fetchNotifications();
     }
+
+    return () => window.removeEventListener('openNotifications', handleOpenNotif);
+  }, [user]);
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await notificationService.getNotifications();
+      setNotifications(data);
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      toast.success('All marked as read');
+    } catch (err) {
+      toast.error('Failed to update notifications');
+    }
+  };
+
+  const handleLogout = () => {
+    setShowLogoutModal(false)
+    toast.success('Signing out...')
+    
+    // Clear all session data immediately
+    window.sessionStorage.clear()
+    
+    // Perform sign out in background
+    signOut().catch(err => console.error('Signout background err:', err));
+    
+    // Force a full clean redirect to login
+    window.location.href = '/'
   }
 
-  const notifications = [
-    { id: 1, type: 'SUCCESS', title: 'Course Completed', msg: 'You have mastered "Surface Prep 101"', time: '2m ago' },
-    { id: 2, type: 'INFO', title: 'New Workshop', msg: 'Advanced Glossing is now live', time: '1h ago' },
-    { id: 3, type: 'ALERT', title: 'Payment Due', msg: 'Your PRO subscription renews in 3 days', time: '4h ago' },
-  ];
+
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode)
     document.documentElement.classList.toggle('dark')
   }
 
-  const firstName = user?.user_metadata?.first_name || 'Professional'
+  const firstName = profile?.first_name || user?.user_metadata?.first_name || 'Professional'
+  const lastName = profile?.last_name || user?.user_metadata?.last_name || ''
 
   return (
-    <nav className="h-20 bg-white border-b-2 border-primary-500 flex items-center sticky top-0 z-[100] transition-all shadow-sm">
+    <nav className="h-20 bg-white dark:bg-secondary-900 border-b-2 border-slate-100 flex items-center fixed top-0 left-0 w-full z-[100] transition-all shadow-sm">
       
       <div className="max-w-[1440px] mx-auto w-full px-6 flex items-center justify-between">
         
         {/* Logo Section */}
-        <NavLink to={isAdmin ? "/admin" : "/"} className="flex items-center gap-4 shrink-0">
-          <div className="h-10 w-10 bg-primary-500 rounded flex items-center justify-center p-1.5 shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 overflow-hidden">
-             <img src="/Capplc-logo.png" alt="Logo" className="w-full h-full object-contain" />
+        <NavLink to={variant === 'super-admin' ? "/super-admin" : variant === 'admin' ? "/admin" : "/dashboard"} className="flex items-center gap-4 shrink-0">
+          <div className={`h-10 w-10 ${variant === 'super-admin' ? 'bg-white' : 'bg-secondary-900'} rounded flex items-center justify-center p-1.5 shadow-sm transition-transform hover:scale-105 active:scale-95 shrink-0 overflow-hidden`}>
+             <img src={variant === 'super-admin' ? "/1879-logo.png" : "/Capplc-logo.png"} alt="Logo" className="w-full h-full object-contain" />
           </div>
           <div className="hidden md:block leading-none text-left">
             <p className="text-lg font-bold tracking-tight text-secondary-900 leading-none">
-              Business <span className="text-primary-500">Pro</span>
+              {variant === 'super-admin' ? 'Tech Hub' : 'Business Pro'}
             </p>
-            <p className="text-[10px] font-medium text-slate-400 mt-1 uppercase tracking-tight leading-none">CAP PLC</p>
+            <p className="text-[10px] font-medium text-slate-400 mt-1 tracking-tight leading-none">{variant === 'super-admin' ? '1879' : 'Cap Plc'}</p>
           </div>
         </NavLink>
 
@@ -98,12 +124,12 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
               key={item.to}
               to={item.to}
               viewTransition
-              end={item.to === '/' || item.to === '/admin'}
+              end={item.to === '/dashboard' || item.to === '/admin' || item.to === '/super-admin'}
               className={({ isActive }) =>
-                `px-6 py-2 rounded-full text-xs font-bold transition-all uppercase tracking-widest ${
+                `px-6 py-2 rounded-full text-xs font-bold transition-all tracking-wide ${
                   isActive
-                    ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
-                    : 'text-slate-500 hover:text-secondary-900 hover:bg-slate-50'
+                    ? variant === 'super-admin' ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-primary-500 text-white shadow-lg shadow-primary-500/20'
+                    : `text-slate-500 ${variant === 'super-admin' ? 'hover:text-red-500' : 'hover:text-primary-500'} dark:text-slate-400`
                 }`
               }
             >
@@ -130,7 +156,9 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
               className={`h-10 w-10 flex items-center justify-center rounded-md relative transition-all border ${showNotifications ? 'border-primary-100 bg-primary-50 text-primary-500' : 'text-slate-400 hover:text-secondary-500 hover:bg-slate-50 hover:border-slate-100 border-transparent'}`}
             >
               <Bell size={18} />
-              <span className="absolute top-2.5 right-2.5 h-1.5 w-1.5 bg-primary-500 rounded-full border border-white" />
+              {notifications.some(n => !n.is_read) && (
+                <span className="absolute top-2.5 right-2.5 h-1.5 w-1.5 bg-primary-500 rounded-full border border-white" />
+              )}
             </button>
 
             {/* Notifications Dropdown */}
@@ -143,27 +171,33 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
                        <h4 className="text-sm font-bold text-secondary-900 tracking-tight leading-none">Notifications</h4>
                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Recent Activity</p>
                     </div>
-                    <span className="bg-primary-50 text-primary-500 border border-primary-100 text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest">3 New</span>
+                    {notifications.filter(n => !n.is_read).length > 0 && (
+                      <span className="bg-primary-50 text-primary-500 border border-primary-100 text-[9px] px-2 py-1 rounded font-bold uppercase tracking-widest">{notifications.filter(n => !n.is_read).length} New</span>
+                    )}
                   </div>
                   <div className="max-h-[400px] overflow-y-auto no-scrollbar bg-white divide-y divide-slate-50">
-                    {notifications.map((n) => (
-                      <div key={n.id} className="p-6 hover:bg-slate-50 transition-all cursor-pointer group text-left border-l-4 border-l-transparent hover:border-l-primary-500 relative">
+                    {notifications.length > 0 ? notifications.map((n) => (
+                      <div key={n.id} className={`p-6 hover:bg-slate-50 transition-all cursor-pointer group text-left border-l-4 border-l-transparent hover:border-l-primary-500 relative ${!n.is_read ? 'bg-primary-50/20' : ''}`}>
                         <div className="flex gap-4 items-start">
-                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border shadow-sm transition-transform group-hover:scale-110 ${n.type === 'SUCCESS' ? 'bg-green-50 text-green-500 border-green-100' : n.type === 'ALERT' ? 'bg-orange-50 text-orange-500 border-orange-100' : 'bg-blue-50 text-blue-500 border-blue-100'}`}>
+                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 border shadow-sm transition-transform group-hover:scale-110 ${n.type === 'SUCCESS' ? 'bg-green-50 text-green-500 border-green-100' : n.type === 'ALERT' ? 'bg-orange-50 text-orange-500 border-orange-100' : 'bg-primary-50 text-primary-500 border border-primary-100'}`}>
                             {n.type === 'SUCCESS' ? <CheckCircle2 size={18} /> : n.type === 'ALERT' ? <AlertCircle size={18} /> : <Bell size={18} />}
                           </div>
                           <div className="space-y-1.5 flex-1 pr-4">
                             <p className="text-xs font-bold text-secondary-900 group-hover:text-primary-500 transition-colors leading-tight">{n.title}</p>
-                            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{n.msg}</p>
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-1">{n.time}</p>
+                            <p className="text-[11px] text-slate-500 leading-relaxed font-medium">{n.message}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pt-1">{new Date(n.created_at).toLocaleDateString()}</p>
                           </div>
-                          {n.type === 'SUCCESS' && <div className="h-2 w-2 bg-primary-500 rounded-full mt-2" />}
+                          {!n.is_read && <div className="h-2 w-2 bg-primary-500 rounded-full mt-2" />}
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="p-10 text-center">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No notifications</p>
+                      </div>
+                    )}
                   </div>
                   <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
-                     <button className="text-[10px] font-bold text-slate-500 hover:text-primary-500 transition-colors uppercase tracking-[0.2em] py-2 w-full active:scale-95">
+                     <button onClick={handleMarkAllAsRead} className="text-[10px] font-bold text-slate-500 hover:text-primary-500 transition-colors uppercase tracking-[0.2em] py-2 w-full active:scale-95">
                         Mark All As Read
                      </button>
                   </div>
@@ -196,13 +230,22 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
                 <div className="absolute top-[calc(100%+12px)] right-0 w-60 bg-white rounded-lg shadow-2xl border border-slate-200 p-2 z-[120] animate-slide-up">
                   <div className="p-3 bg-slate-50 rounded mb-2 border border-slate-100 text-left">
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 leading-none">Account</p>
-                     <p className="text-sm font-bold text-secondary-900 truncate">{firstName} Ali</p>
+                     <p className="text-sm font-bold text-secondary-900 truncate">{firstName} {lastName}</p>
                   </div>
-                  <NavAction icon={<User size={14} />} label="Professional Profile" to="/profile" onClick={() => setShowProfileMenu(false)} />
-                  <NavAction icon={<Settings size={14} />} label="System Identity" to="/profile" onClick={() => setShowProfileMenu(false)} />
-                  <div className="h-px bg-slate-50 my-1 mx-1" />
+                  <>
+                    <NavAction 
+                      icon={<User size={14} />} 
+                      label="Profile" 
+                      to={variant === 'super-admin' ? '/super-admin/profile' : variant === 'admin' ? '/admin/profile' : '/profile'} 
+                      onClick={() => setShowProfileMenu(false)} 
+                    />
+                    <div className="h-px bg-slate-50 my-1 mx-1" />
+                  </>
                   <button 
-                    onClick={handleLogout}
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setShowLogoutModal(true);
+                    }}
                     className="w-full flex items-center gap-3 px-4 py-3 text-red-500 font-medium hover:bg-red-50 rounded text-xs transition-all"
                   >
                     <LogOut size={14} /> Sign Out
@@ -240,6 +283,33 @@ export default function TopNav({ isAdmin = false }: TopNavProps) {
            </div>
         </div>
       )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-slide-up">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl">
+             <div className="h-12 w-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center mb-6">
+                <LogOut size={24} />
+             </div>
+             <h3 className="text-xl font-bold text-secondary-900 tracking-tight leading-none mb-2">Sign Out</h3>
+             <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">Are you sure you want to securely exit the platform? You will need to sign in again to access training.</p>
+             <div className="flex gap-4">
+                <button 
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 py-3 bg-slate-50 hover:bg-slate-100 text-secondary-900 border border-slate-200 font-bold rounded-xl text-xs uppercase tracking-widest transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-xs uppercase tracking-widest transition-all shadow-md shadow-red-500/20"
+                >
+                  Sign Out
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
@@ -250,7 +320,7 @@ function NavAction({ icon, label, to, onClick }: { icon: React.ReactNode; label:
       to={to} 
       viewTransition
       onClick={onClick}
-      className="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:bg-slate-50 hover:text-primary-500 rounded text-xs transition-all text-left"
+      className="flex items-center gap-3 px-4 py-3 text-slate-500 font-medium hover:text-primary-500 rounded text-xs transition-all text-left"
     >
       {icon} {label}
     </NavLink>

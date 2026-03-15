@@ -14,11 +14,17 @@ declare global {
 // Route imports
 import authRoutes from './routes/auth.routes'
 import courseRoutes from './routes/course.routes'
+import moduleRoutes from './routes/module.routes'
+import videoRoutes from './routes/video.routes'
+import progressRoutes from './routes/progress.routes'
+import webhookRoutes from './routes/webhook.routes'
 import subscriptionRoutes from './routes/subscription.routes'
 import paymentRoutes from './routes/payment.routes'
 import certificateRoutes from './routes/certificate.routes'
 import userRoutes from './routes/user.routes'
 import analyticsRoutes from './routes/analytics.routes'
+import superAdminRoutes from './routes/super-admin.routes'
+import notificationRoutes from './routes/notification.routes'
 
 dotenv.config()
 
@@ -40,18 +46,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes (Mounted without /api prefix because Vite proxy will rewrite it)
+// Routes
 app.use('/auth', authRoutes)
 app.use('/courses', courseRoutes)
+app.use('/modules', moduleRoutes)
+app.use('/videos', videoRoutes)
+app.use('/progress', progressRoutes)
+app.use('/webhooks', webhookRoutes)
 app.use('/subscriptions', subscriptionRoutes)
 app.use('/payments', paymentRoutes)
 app.use('/certificates', certificateRoutes)
 app.use('/users', userRoutes)
 app.use('/analytics', analyticsRoutes)
+app.use('/super-admin', superAdminRoutes)
+app.use('/notifications', notificationRoutes)
 
 // Test route
 app.get('/test-api', (req, res) => {
-  res.json({ message: 'API is reachable', routes: ['auth', 'courses', 'analytics', 'users'] })
+  res.json({ message: 'API is reachable', routes: ['auth', 'courses', 'modules', 'videos', 'progress', 'analytics'] })
 })
 
 // Health check
@@ -73,7 +85,6 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 CAP Business Pro API running on port ${PORT}`)
-  console.log(`Registered sectors: /auth, /courses, /subscriptions, /payments, /certificates, /users, /analytics`)
 })
 
 export default app

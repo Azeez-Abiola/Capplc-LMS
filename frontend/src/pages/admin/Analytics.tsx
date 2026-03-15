@@ -1,6 +1,42 @@
-import { Users, Target, ShieldCheck, Award, Zap, Clock, ChevronRight } from 'lucide-react'
+import { Users, Target, ShieldCheck, Award, Zap, Calendar } from 'lucide-react'
+import LogoLoader from '../../components/ui/LogoLoader'
+import { useState, useEffect } from 'react'
+import { analyticsService } from '../../services/analyticsService'
+import type { AdminStats } from '../../services/analyticsService'
 
 export default function Analytics() {
+  const [activeDate, setActiveDate] = useState('30D')
+  const [stats, setStats] = useState<AdminStats | null>(null)
+  const [detailed, setDetailed] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [s, d] = await Promise.all([
+          analyticsService.getAdminStats(),
+          analyticsService.getDetailedEngagementAdmin()
+        ])
+        setStats(s)
+        setDetailed(d)
+      } catch (error) {
+        console.error('Analytics error:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <LogoLoader fullscreen />
+    )
+  }
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const activityData = detailed?.activity || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
   return (
     <div className="space-y-10 animate-slide-up pb-10">
       
@@ -10,24 +46,30 @@ export default function Analytics() {
           <h1 className="text-2xl font-bold tracking-tight text-secondary-900 leading-none">Platform Performance</h1>
           <p className="text-slate-500 text-sm font-medium">Detailed insights into user engagement and module completion.</p>
         </div>
-        <div className="flex p-1 bg-slate-100/50 rounded-xl border border-slate-100 shadow-sm">
-           {['24H', '7D', '30D', 'YTD'].map((period) => (
-             <button 
-               key={period} 
-               className={`px-5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${period === '30D' ? 'bg-white text-primary-500 shadow-sm border border-slate-100' : 'text-slate-400 hover:text-secondary-900'}`}
-             >
-               {period}
-             </button>
-           ))}
+        <div className="relative shrink-0">
+           <select 
+             value={activeDate}
+             onChange={(e) => setActiveDate(e.target.value)}
+             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+           >
+              <option value="24H">Last 24 Hours</option>
+              <option value="7D">Last 7 Days</option>
+              <option value="30D">Last 30 Days</option>
+              <option value="YTD">Year to Date</option>
+           </select>
+           <button className="flex items-center gap-3 px-5 py-3 h-11 bg-white border border-slate-200 rounded-xl shadow-sm text-secondary-900 group hover:border-primary-500 transition-all flex-1 sm:flex-none">
+             <Calendar size={18} className="text-slate-400 group-hover:text-primary-500 transition-colors" />
+             <span className="text-xs font-bold uppercase tracking-widest">{activeDate === '24H' ? 'Last 24 Hours' : activeDate === '7D' ? 'Last 7 Days' : activeDate === 'YTD' ? 'Year to Date' : 'Last 30 Days'}</span>
+           </button>
         </div>
       </div>
 
       {/* Primary Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-         <AnalyticsStatCard title="Active Users" value="1.2k" trend="+12%" icon={<Users size={22} />} description="Users active on the platform." />
-         <AnalyticsStatCard title="Engagement" value="68.4%" trend="+5.2%" icon={<Zap size={22} />} description="Module interaction frequency." />
-         <AnalyticsStatCard title="Certifications" value="142" trend="+14" icon={<Target size={22} />} description="New certificates generated." />
-         <AnalyticsStatCard title="User Retention" value="94.2%" trend="+2.4%" icon={<ShieldCheck size={22} />} description="Stable account activity rate." />
+         <AnalyticsStatCard title="Total Users" value={stats?.totalUsers.toString() || "0"} trend={`+${stats?.growth || 0}%`} icon={<Users size={22} />} description="Registered professionals." />
+         <AnalyticsStatCard title="Engagement" value={`${Math.round(((stats?.dailyEngagement || 0) / (stats?.totalUsers || 1)) * 100)}%`} trend="Active" icon={<Zap size={22} />} description="Daily active interaction." />
+         <AnalyticsStatCard title="Certifications" value={stats?.totalCertificates.toString() || "0"} trend="Validated" icon={<Target size={22} />} description="Unique credentials issued." />
+         <AnalyticsStatCard title="Company Subscriptions" value={stats?.activeSubscriptions.toString() || "0"} trend="Active" icon={<ShieldCheck size={22} />} description="Teams on premium tracks." />
       </div>
 
       {/* Detailed Visualization */}
@@ -46,24 +88,31 @@ export default function Analytics() {
                </div>
             </div>
             
-            <div className="h-[350px] flex items-end gap-4 px-2">
-               {[40, 65, 30, 85, 45, 75, 55, 95, 40, 80, 50, 65].map((val, i) => (
-                  <div key={i} className="flex-1 group relative">
-                     <div 
-                       className="w-full bg-slate-50 border border-slate-50 rounded-lg group-hover:bg-primary-500 transition-all duration-300 cursor-pointer relative shadow-inner"
-                       style={{ height: `${val}%` }}
-                     />
-                     <p className="text-[10px] font-bold text-slate-300 text-center mt-6 uppercase tracking-tight">
-                       {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][i]}
-                     </p>
-                  </div>
-               ))}
+            <div className="h-[350px] flex items-end gap-3 px-2">
+               {activityData.map((val: number, i: number) => {
+                  const maxVal = Math.max(...activityData, 1)
+                  const height = (val / maxVal) * 100
+                  return (
+                    <div key={i} className="flex-1 group relative">
+                       <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-secondary-900 text-white text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                          {val} entries
+                       </div>
+                       <div 
+                         className="w-full bg-slate-50 border border-slate-50 rounded-lg group-hover:bg-primary-500 transition-all duration-300 cursor-pointer relative shadow-inner"
+                         style={{ height: `${height}%` }}
+                       />
+                       <p className="text-[9px] font-bold text-slate-300 text-center mt-6 uppercase tracking-tight group-hover:text-secondary-900 transition-colors">
+                         {months[i]}
+                       </p>
+                    </div>
+                  )
+               })}
             </div>
          </div>
 
          {/* Supplemental Statistics Feed */}
          <div className="lg:col-span-4 space-y-10">
-            <div className="p-8 bg-secondary-900 rounded-3xl relative overflow-hidden group shadow-xl transition-all hover:scale-[1.02]">
+            <div className="p-8 bg-secondary-900 rounded-3xl relative overflow-hidden group shadow-xl transition-all hover:scale-[1.02] h-full">
                <div className="flex items-center gap-4 border-b border-white/10 pb-6 mb-8 relative z-10">
                   <div className="h-10 w-10 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
                     <Award size={22} className="text-primary-500" />
@@ -71,33 +120,25 @@ export default function Analytics() {
                   <h3 className="text-sm font-bold text-white uppercase tracking-widest leading-none">Certificate Distribution</h3>
                </div>
                <div className="space-y-6 relative z-10">
-                  <ChartRatio label="Luxury Mastery" value={45} />
-                  <ChartRatio label="Technical Standards" value={30} />
-                  <ChartRatio label="Safety & Compliance" value={15} />
-                  <ChartRatio label="Project Management" value={10} />
+                  {detailed?.distribution && detailed.distribution.some((d: any) => d.value > 0) ? (
+                    detailed.distribution.map((d: any, i: number) => {
+                      const total = detailed.distribution.reduce((acc: number, cur: any) => acc + cur.value, 0) || 1
+                      const percent = Math.round((d.value / total) * 100)
+                      return <ChartRatio key={i} label={d.label} value={percent} />
+                    })
+                  ) : (
+                    <div className="py-10 text-center space-y-4">
+                       <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">No certificates issued yet</p>
+                    </div>
+                  )}
                </div>
                <div className="pt-8 border-t border-white/5 relative z-10 mt-8 text-center space-y-4">
-                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.25em]">Monthly Target Completion</p>
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.25em]">Registry Engagement</p>
                   <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden shadow-inner">
-                     <div className="h-full w-[71%] bg-primary-500 shadow-[0_0_15px_rgba(255,94,36,0.3)] transition-all" />
+                     <div className="h-full bg-primary-500 shadow-[0_0_15px_rgba(255,94,36,0.3)] transition-all" style={{ width: stats?.totalCertificates ? '100%' : '0%' }} />
                   </div>
                </div>
                <div className="absolute top-0 right-0 h-[250px] w-[250px] bg-primary-500/5 rounded-full blur-[60px] translate-x-1/2 -translate-y-1/2" />
-            </div>
-
-            <div className="p-8 bg-primary-500 text-white rounded-3xl relative overflow-hidden group shadow-xl transition-all hover:shadow-primary-500/20">
-               <div className="relative z-10 space-y-8">
-                  <div className="h-12 w-12 bg-white/15 rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
-                     <Clock size={24} />
-                  </div>
-                  <div className="space-y-2">
-                     <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/60">System Throughput</h4>
-                     <p className="text-2xl font-bold tracking-tight">+4.2x Module Efficiency</p>
-                  </div>
-                  <button className="w-full py-4 bg-white text-primary-500 text-[10px] font-bold rounded-xl flex items-center justify-center gap-3 group/btn uppercase tracking-[0.2em] shadow-lg transition-all active:scale-95 hover:bg-secondary-900 hover:text-white">
-                     View Complete Stats <ChevronRight size={16} />
-                  </button>
-               </div>
             </div>
          </div>
 

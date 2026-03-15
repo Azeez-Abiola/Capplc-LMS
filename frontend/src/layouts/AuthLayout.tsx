@@ -10,25 +10,25 @@ export default function AuthLayout() {
          <img 
            src="/auth-bg.png" 
            alt="Painting Background" 
-           className="absolute inset-0 w-full h-full object-cover scale-110 blur-[1px]"
+           className="absolute inset-0 w-full h-full object-cover"
          />
          
          {/* Premium Dark Overlay for contrast */}
          <div className="absolute inset-0 bg-gradient-to-br from-secondary-900/95 via-secondary-900/80 to-secondary-900/40" />
          
          <div className="relative z-10 space-y-12 max-w-lg">
-            <NavLink to="/" className="flex items-center gap-5 group">
+            <NavLink to="/" className="flex items-center gap-5 group text-left">
                <div className="h-14 w-14 bg-white rounded border border-white/20 flex items-center justify-center p-2.5 shadow-2xl transition-all group-hover:scale-110">
                   <img src="/Capplc-logo.png" alt="Logo" className="h-full w-auto object-contain" />
                </div>
-               <div className="space-y-0.5 text-left">
-                  <span className="block text-2xl font-bold tracking-[0.2em] text-white uppercase leading-none">Business <span className="text-primary-500">Pro</span></span>
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">CAP PLC Digital Ecosystem</span>
+               <div className="space-y-0.5">
+                  <span className="block text-2xl font-bold tracking-[0.2em] text-white leading-none">Business <span className="text-primary-500">Pro</span></span>
+                  <span className="block text-[10px] font-bold text-slate-400 tracking-widest leading-none mt-1">Cap Plc digital ecosystem</span>
                </div>
             </NavLink>
             
-            <div className="space-y-6">
-               <h1 className="text-6xl font-extrabold text-white leading-[1.05] tracking-tight uppercase">
+            <div className="space-y-6 text-left">
+               <h1 className="text-6xl font-extrabold text-white leading-[1.05] tracking-tight capitalize">
                   Professional <br />
                   <span className="text-primary-500">Mastery.</span>
                </h1>
@@ -47,8 +47,8 @@ export default function AuthLayout() {
                  <img src="/Capplc-logo.png" alt="Logo" className="h-full w-auto object-contain" />
               </div>
               <div className="text-center">
-                 <span className="block text-xl font-bold tracking-tight text-secondary-500 dark:text-white uppercase tracking-widest leading-none">Business <span className="text-primary-500">Pro</span></span>
-                 <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">CAP PLC Digital</span>
+                 <span className="block text-xl font-bold tracking-tight text-secondary-500 dark:text-white leading-none">Business <span className="text-primary-500">Pro</span></span>
+                 <span className="block text-[8px] font-bold text-slate-400 tracking-[0.3em] mt-2">Cap Plc digital</span>
               </div>
            </div>
 
@@ -59,8 +59,8 @@ export default function AuthLayout() {
 
         {/* Minimal Footer */}
         <div className="absolute bottom-10 inset-x-0 text-center">
-           <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.5em] leading-none">
-              © 2026 CAP PLC
+           <p className="text-[10px] font-bold text-slate-300 tracking-[0.5em] leading-none">
+              © 2026 Cap Plc
            </p>
         </div>
       </div>

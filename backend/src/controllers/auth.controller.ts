@@ -4,20 +4,25 @@ import { sendEmail } from '../utils/email'
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, first_name, last_name, phone, state } = req.body
+    const { email, password, first_name, last_name, phone, state, whatsapp_number, city, years_of_experience, specialty } = req.body
 
-    // 1. Create user in Supabase Auth using Admin API for auto-confirmation
-    // This bypasses the email rate limit and 'inactive' status barrier
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // 1. Create user in Supabase Auth using standard signUp
+    // This allows Supabase to handle the 'Confirm your email' flow automatically
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      email_confirm: true,
-      user_metadata: {
-        first_name,
-        last_name,
-        phone,
-        state,
-        role: 'painter'
+      options: {
+        data: {
+          first_name,
+          last_name,
+          phone,
+          state,
+          whatsapp_number,
+          city,
+          years_of_experience,
+          specialty,
+          role: 'painter'
+        }
       }
     })
 
@@ -27,7 +32,7 @@ export const register = async (req: Request, res: Response) => {
       if (authError.code === 'over_email_send_rate_limit') {
         throw new Error('Supabase email limit exceeded. Please try again in an hour or contact the administrator to setup custom SMTP.')
       }
-      if (authError.code === 'email_already_registered') {
+      if (authError.code === 'user_already_exists') {
         throw new Error('This email is already registered. Please sign in instead.')
       }
       throw authError
@@ -54,7 +59,7 @@ export const register = async (req: Request, res: Response) => {
     }
 
     res.status(201).json({ 
-      message: 'Registration successful. Account is active.',
+      message: 'Registration successful. Please check your email to confirm your account.',
       user: authData.user 
     })
   } catch (error: any) {
@@ -87,7 +92,17 @@ export const login = async (req: Request, res: Response) => {
       user: data.user
     })
   } catch (error: any) {
-    res.status(401).json({ error: error.message })
+    console.error('[LOGIN_ERROR_DETAIL]', {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      stack: error.stack
+    })
+    res.status(error.status || 500).json({ 
+      error: error.message || 'Login failed',
+      details: error.details,
+      code: error.code
+    })
   }
 }
 

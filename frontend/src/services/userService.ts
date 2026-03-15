@@ -7,8 +7,14 @@ export interface UserProfile {
   email: string
   phone: string
   state: string
+  city?: string
+  whatsapp_number?: string
   role: string
   status: 'active' | 'inactive' | 'suspended'
+  specialty?: string
+  years_of_experience?: string
+  onboarding_completed?: boolean
+  interests?: string[]
   created_at: string
 }
 
@@ -36,5 +42,14 @@ export const userService = {
   async updateProfile(profileData: any): Promise<any> {
     const { data } = await api.put('users/profile', profileData)
     return data
+  },
+
+  async updateUser(id: string, userData: any): Promise<UserProfile> {
+    const { data } = await api.put(`users/${id}`, userData)
+    return data
+  },
+
+  async deactivateUser(id: string): Promise<void> {
+    await api.post(`users/${id}/deactivate`)
   }
 }

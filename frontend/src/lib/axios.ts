@@ -1,4 +1,15 @@
 import axios from 'axios'
+import { getSafeSession, clearSafeSessionCache, getInternalToken, setInternalToken } from './supabase'
+
+let tempToken: string | null = null
+
+export const clearSessionCache = () => {
+  clearSafeSessionCache()
+}
+
+export const setTempToken = (token: string | null) => {
+  tempToken = token
+}
 
 const api = axios.create({
   baseURL: '/api/',
@@ -8,31 +19,53 @@ const api = axios.create({
 })
 
 // Request interceptor — attach auth token
-api.interceptors.request.use((config) => {
-  // Try to find the supabase token in localStorage
-  const supabaseTokenKey = Object.keys(localStorage).find(key => key.includes('auth-token'));
-  if (supabaseTokenKey) {
-    try {
-      const session = JSON.parse(localStorage.getItem(supabaseTokenKey) || '{}');
-      const token = session.access_token;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (e) {
-      console.error('Failed to parse token session', e);
-    }
+api.interceptors.request.use(async (config) => {
+  // 1. Priority: Temp token (set right after login, before Supabase finishes)
+  const token = tempToken || getInternalToken()
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+    return config
   }
-  return config;
+
+  // 2. Fallback: fetch from Supabase session (cached + deduped)
+  try {
+    const result = await getSafeSession()
+    const sessionToken = result?.data?.session?.access_token
+    if (sessionToken) {
+      setInternalToken(sessionToken)
+      config.headers.Authorization = `Bearer ${sessionToken}`
+    }
+  } catch {
+    // Quiet fail — request proceeds without auth header
+  }
+  return config
 })
 
-// Response interceptor — handle auth errors
+// Response interceptor — auto-retry on 401 once with a fresh token
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-       // Clear session if unauthorized to avoid loop
-       // window.location.href = '/login'; 
+  async (error) => {
+    const originalRequest = error.config
+
+    // Only retry once, and only for 401s
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      // Force-refresh the session
+      clearSafeSessionCache()
+      try {
+        const result = await getSafeSession()
+        const freshToken = result?.data?.session?.access_token
+        if (freshToken) {
+          setInternalToken(freshToken)
+          originalRequest.headers.Authorization = `Bearer ${freshToken}`
+          return api(originalRequest) // Retry the request
+        }
+      } catch {
+        // Give up silently
+      }
     }
+
     return Promise.reject(error)
   }
 )

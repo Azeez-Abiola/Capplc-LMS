@@ -8,7 +8,11 @@ export const getAllTiers = async (_req: Request, res: Response) => {
       .select('*')
       .order('price', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+       console.error('[SUBS_ERROR] Fetch Tiers:', error.message)
+       // Return empty array if table doesn't exist yet to prevent frontend crash
+       return res.json([])
+    }
 
     res.json(data)
   } catch (error: any) {
@@ -26,12 +30,20 @@ export const getUserSubscription = async (req: Request, res: Response) => {
       .select('*, subscription_tiers(*)')
       .eq('user_id', userId)
       .eq('status', 'active')
-      .single()
+      .maybeSingle() // Safer than .single()
 
-    if (error && error.code !== 'PGRST116') throw error // PGRST116 is "no rows returned"
+    if (error) {
+      console.error('[SUBS_ERROR] Fetch User Sub:', error.message)
+      // Check if it's a schema error
+      if (error.code === 'PGRST204' || error.message.includes('relation') || error.message.includes('column')) {
+        return res.json({ message: 'Database schema mismatch. Please run migrations.', error: error.message })
+      }
+      throw error
+    }
 
     res.json(data || { message: 'No active subscription found' })
   } catch (error: any) {
+    console.error('[SUBS_USER_500]', error)
     res.status(500).json({ error: error.message })
   }
 }

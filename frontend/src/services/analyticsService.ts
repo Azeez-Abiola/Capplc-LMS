@@ -6,6 +6,7 @@ export interface AdminStats {
   totalCertificates: number
   activeSubscriptions: number
   revenue: number
+  dailyEngagement: number
   growth: number
 }
 
@@ -14,6 +15,7 @@ export interface UserStats {
   completedCourses: number
   certificatesIssued: number
   totalXp: number
+  enrolledCourseData?: any[]
 }
 
 export const analyticsService = {
@@ -24,6 +26,11 @@ export const analyticsService = {
 
   async getUserStats(): Promise<UserStats> {
     const { data } = await api.get('analytics/user')
+    return data
+  },
+
+  async getDetailedEngagementAdmin(): Promise<any> {
+    const { data } = await api.get('analytics/admin/detailed')
     return data
   }
 }

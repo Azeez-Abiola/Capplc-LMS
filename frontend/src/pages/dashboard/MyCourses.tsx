@@ -1,16 +1,28 @@
-import { Search, Filter, Clock, TrendingUp, ChevronRight, CheckCircle2, Loader2 } from 'lucide-react'
+import { Search, Filter, Clock, TrendingUp, ChevronRight, CheckCircle2 } from 'lucide-react'
+import LogoLoader from '../../components/ui/LogoLoader'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { courseService } from '../../services/courseService'
+import { useAuth } from '../../hooks/useAuth'
 
 export default function MyCourses() {
   const [activeTab, setActiveTab] = useState('Active');
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { profile, loading: authLoading } = useAuth()
 
   useEffect(() => {
+    // Role-based redirection safeguard
+    if (!authLoading && profile) {
+      if (profile.role !== 'painter') {
+        navigate(profile.role === 'admin' ? '/admin' : '/super-admin')
+        return
+      }
+    }
+
     const fetchEnrolled = async () => {
       try {
         const data = await courseService.getEnrolledCourses()
@@ -22,23 +34,27 @@ export default function MyCourses() {
         setLoading(false)
       }
     }
-    fetchEnrolled()
-  }, [])
+
+    if (!authLoading && profile) {
+      fetchEnrolled()
+    }
+  }, [profile, authLoading, navigate])
 
   const filteredCourses = (Array.isArray(courses) ? courses : []).filter(course => {
     if (!course) return false;
     
     const status = (course.status || '').toLowerCase();
     const tabMatch = 
-      (activeTab === 'Active' && (status === 'enrolled' || status === 'active')) ||
-      (activeTab === 'Finished' && (status === 'completed' || status === 'finished')) ||
-      (activeTab === 'Pending' && (status === 'waitlisted' || status === 'pending'));
+      (activeTab === 'Active' && (status === 'enrolled' || status === 'active' || status === 'pending' || status === 'waitlisted')) ||
+      (activeTab === 'Completed' && (status === 'completed' || status === 'finished'));
 
     const searchMatch = 
       (course.title || course.courses?.title || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
       (course.level || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-    return tabMatch && searchMatch;
+    const filterMatch = activeFilter === 'All' || (course.level || 'Intermediate').toLowerCase() === activeFilter.toLowerCase();
+
+    return tabMatch && searchMatch && filterMatch;
   });
 
   return (
@@ -51,29 +67,41 @@ export default function MyCourses() {
           <p className="text-slate-500 text-sm font-medium mt-1">Track your professional learning journey.</p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-          <div className="w-full sm:w-72 bg-white border border-slate-200 rounded-xl flex items-center px-4 py-2.5 shadow-sm group focus-within:ring-4 focus-within:ring-primary-50 focus-within:border-primary-500 transition-all">
-            <Search size={18} className="text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+          <div className="w-full sm:w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center px-4 py-3 shadow-sm group focus-within:ring-4 focus-within:ring-primary-500/10 focus-within:border-primary-500 transition-all">
+            <Search size={18} className="text-slate-400 dark:text-slate-500 group-focus-within:text-primary-500 transition-colors" />
             <input 
               type="text" 
-              placeholder="Search courses..." 
+              placeholder="Search your courses..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent border-none outline-none text-sm font-medium ml-2 flex-1 text-secondary-900 placeholder:text-slate-300 tracking-tight" 
+              className="bg-transparent border-none outline-none text-sm font-medium ml-3 flex-1 text-secondary-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-500 tracking-tight" 
             />
           </div>
-          <button className="h-11 w-full sm:w-11 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-400 hover:text-primary-500 transition-all shadow-sm">
-            <Filter size={18} />
-          </button>
+          <div className="relative shrink-0">
+             <select 
+               value={activeFilter}
+               onChange={(e) => setActiveFilter(e.target.value)}
+               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+             >
+                <option value="All">All Levels</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+             </select>
+              <button className={`h-12 w-full sm:w-12 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center transition-all shadow-sm ${activeFilter !== 'All' ? 'text-primary-500 border-primary-500 bg-primary-50 dark:bg-primary-500/10' : 'text-slate-400 dark:text-slate-500 hover:text-primary-500 hover:border-primary-500'}`}>
+                <Filter size={18} />
+              </button>
+          </div>
         </div>
       </div>
 
       {/* Tabs Layout */}
-      <div className="flex items-center gap-2 p-1 bg-slate-100/50 w-full sm:w-fit rounded-2xl border border-slate-100/50">
-         {['Active', 'Finished', 'Pending'].map((tab) => (
+      <div className="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 w-full sm:w-fit rounded-2xl border border-slate-200/50 dark:border-slate-700">
+         {['Active', 'Completed'].map((tab) => (
            <button 
              key={tab} 
              onClick={() => setActiveTab(tab)}
-             className={`px-4 sm:px-8 py-2.5 text-[10px] sm:text-xs flex-1 sm:flex-none text-center font-bold transition-all rounded-xl uppercase tracking-widest ${activeTab === tab ? 'bg-white text-primary-500 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-secondary-900'}`}
+             className={`px-8 py-2.5 text-[10px] sm:text-xs flex-1 sm:flex-none text-center font-bold transition-all rounded-xl uppercase tracking-widest ${activeTab === tab ? 'bg-white dark:bg-slate-700 text-primary-500 shadow-md border border-slate-100 dark:border-slate-600' : 'text-slate-500 dark:text-slate-400 hover:text-secondary-900 dark:hover:text-white'}`}
            >
              {tab}
            </button>
@@ -83,7 +111,7 @@ export default function MyCourses() {
       {/* Course Grid */}
       {loading ? (
         <div className="py-20 flex flex-col items-center justify-center space-y-4">
-          <Loader2 size={32} className="animate-spin text-primary-500" />
+          <LogoLoader />
           <p className="text-xs font-medium text-slate-400 text-center">Loading your courses...</p>
         </div>
       ) : filteredCourses.length > 0 ? (
@@ -142,19 +170,19 @@ export default function MyCourses() {
            ))}
         </div>
       ) : (
-        <div className="py-24 bg-slate-50/50 border-2 border-dashed border-slate-100 rounded-3xl text-center space-y-6">
-           <div className="h-20 w-20 bg-white shadow-sm rounded-2xl mx-auto flex items-center justify-center text-slate-200">
-              <Search size={32} />
+        <div className="py-24 bg-white dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] text-center space-y-8 shadow-sm">
+           <div className="h-24 w-24 bg-slate-50 dark:bg-slate-700 shadow-inner rounded-3xl mx-auto flex items-center justify-center text-slate-200 dark:text-slate-600 transition-transform group-hover:scale-110">
+              <Search size={40} strokeWidth={1.5} />
            </div>
-           <div className="space-y-2">
-              <p className="text-sm font-bold text-secondary-900 uppercase tracking-widest">No matching courses found</p>
-              <p className="text-xs font-medium text-slate-400 mt-1">Try clarifying your search or changing categories.</p>
+           <div className="space-y-3">
+              <h3 className="text-lg font-bold text-secondary-900 dark:text-white uppercase tracking-widest">No matching courses</h3>
+              <p className="text-xs font-medium text-slate-400 max-w-xs mx-auto leading-relaxed">We couldn't find any courses matching your current search or filters.</p>
            </div>
            <button 
-             onClick={() => {setSearchQuery(''); setActiveTab('Active')}}
-             className="px-8 py-3 bg-white border border-slate-200 text-secondary-900 text-xs font-bold rounded-xl shadow-sm hover:shadow-md transition-all uppercase tracking-widest"
+             onClick={() => {setSearchQuery(''); setActiveFilter('All'); setActiveTab('Active')}}
+             className="px-10 py-4 bg-secondary-900 dark:bg-primary-500 text-white text-[10px] font-bold rounded-xl shadow-xl hover:bg-black dark:hover:bg-primary-600 transition-all uppercase tracking-[0.2em] active:scale-95"
            >
-             Clear Filters
+             Reset All Filters
            </button>
         </div>
       )}

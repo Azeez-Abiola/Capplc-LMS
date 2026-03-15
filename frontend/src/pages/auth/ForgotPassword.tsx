@@ -18,11 +18,11 @@ export default function ForgotPassword() {
           </p>
         </div>
         <div className="flex flex-col gap-4 pt-4">
-          <button onClick={() => setSubmitted(false)} className="w-full bg-slate-50 text-slate-400 font-bold py-4 rounded-3xl border border-slate-200 hover:bg-white hover:text-secondary-900 transition-all text-[10px] uppercase tracking-widest active:scale-95 shadow-sm">
-             Resend Reset Link
+          <button onClick={() => setSubmitted(false)} className="w-full bg-slate-50 text-slate-400 font-bold py-4 rounded-3xl border border-slate-200 hover:bg-white hover:text-secondary-900 transition-all text-[10px] tracking-wide active:scale-95 shadow-sm">
+             Resend reset link
           </button>
-          <NavLink to="/login" className="w-full bg-secondary-900 text-white font-bold py-4 rounded-3xl shadow-xl text-center flex items-center justify-center gap-3 text-[10px] uppercase tracking-widest hover:bg-black transition-all active:scale-95">
-             <ArrowLeft size={16} /> Return to Sign In
+          <NavLink to="/login" className="w-full bg-secondary-900 text-white font-bold py-4 rounded-3xl shadow-xl text-center flex items-center justify-center gap-3 text-[10px] tracking-wide hover:bg-black transition-all active:scale-95">
+             <ArrowLeft size={16} /> Return to sign in
           </NavLink>
         </div>
       </div>
@@ -32,11 +32,11 @@ export default function ForgotPassword() {
   return (
     <div className="space-y-10 animate-slide-up text-left">
       <div className="space-y-6">
-        <NavLink to="/login" className="inline-flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-primary-500 uppercase tracking-widest transition-colors font-sans pl-1">
-           <ArrowLeft size={14} /> Back to Sign In
+        <NavLink to="/login" className="inline-flex items-center gap-2 text-[10px] font-bold text-slate-400 hover:text-primary-500 tracking-wide transition-colors font-sans pl-1">
+           <ArrowLeft size={14} /> Back to sign in
         </NavLink>
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-secondary-900 tracking-tight leading-none">Reset Password</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 tracking-tight leading-none">Reset password</h1>
           <p className="text-sm font-medium text-slate-400">
             Enter your email to receive a password restoration link.
           </p>
@@ -45,7 +45,7 @@ export default function ForgotPassword() {
 
       <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}>
         <div className="space-y-3 font-sans">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-2">Email Address</label>
+          <label className="text-[10px] font-bold text-slate-400 tracking-wide ml-2">Email address</label>
           <div className="relative group">
             <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary-500 transition-colors pointer-events-none">
                <Mail size={18} />
@@ -59,13 +59,13 @@ export default function ForgotPassword() {
           </div>
         </div>
 
-        <button type="submit" className="w-full bg-secondary-900 text-white font-bold py-4 rounded-3xl shadow-xl hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 text-xs uppercase tracking-[0.2em]">
-          Send Reset Link <ArrowRight size={18} />
+        <button type="submit" className="w-full bg-secondary-900 text-white font-bold py-4 rounded-3xl shadow-xl hover:bg-black transition-all active:scale-95 flex items-center justify-center gap-3 text-xs tracking-wide">
+          Send reset link <ArrowRight size={18} />
         </button>
       </form>
 
       <div className="p-8 bg-slate-50/50 rounded-3xl border border-slate-50 shadow-sm">
-         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed text-center">
+         <p className="text-[10px] font-bold text-slate-400 tracking-wide leading-relaxed text-center">
            Need help? Reach out to support: <br/>
            <span className="text-secondary-900">support@capplc.com</span> or <span className="text-secondary-900">+234-800-CAP-PRO</span>
          </p>

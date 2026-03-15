@@ -17,4 +17,9 @@ export const paymentService = {
     const { data } = await api.get('/payments/history')
     return data
   },
+
+  async getAllPaymentsAdmin(): Promise<Payment[]> {
+    const { data } = await api.get('/payments/admin/all')
+    return data
+  },
 }

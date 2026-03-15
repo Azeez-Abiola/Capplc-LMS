@@ -47,6 +47,8 @@ export interface Course {
   description: string
   tierAccess: SubscriptionTier
   thumbnail?: string
+  thumbnail_url?: string
+  video_url?: string
   durationMinutes: number
   status: CourseStatus
   modules: Module[]

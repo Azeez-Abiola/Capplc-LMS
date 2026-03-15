@@ -1,4 +1,6 @@
-import { Play, CheckCircle2, Clock, BookOpen, Layers, Star, Download, ChevronRight, Loader2 } from 'lucide-react'
+import { Play, CheckCircle2, Clock, BookOpen, Layers, Star, Download, ChevronRight, ArrowLeft } from 'lucide-react'
+
+import LogoLoader from '../../components/ui/LogoLoader'
 import { NavLink, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { courseService } from '../../services/courseService'
@@ -33,10 +35,7 @@ export default function CourseDetail() {
 
   if (loading) {
     return (
-      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 size={32} className="animate-spin text-primary-500" />
-        <p className="text-xs font-medium text-slate-400">Loading course details...</p>
-      </div>
+      <LogoLoader fullscreen />
     )
   }
 
@@ -50,7 +49,17 @@ export default function CourseDetail() {
   }
 
   return (
-    <div className="space-y-10 animate-slide-up pb-10">
+    <div className="space-y-6 animate-slide-up pb-10">
+      
+      {/* Back Button */}
+      <NavLink 
+        to="/video-library" 
+        className="flex items-center gap-2 text-slate-400 hover:text-primary-500 transition-all font-bold text-[10px] uppercase tracking-[0.2em] group w-fit"
+      >
+        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+        Back to Library
+      </NavLink>
+
       
       {/* Hero Section */}
       <div className="relative min-h-[350px] md:h-[400px] bg-secondary-900 overflow-hidden rounded-2xl shadow-xl">
