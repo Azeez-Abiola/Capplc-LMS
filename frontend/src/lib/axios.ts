@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { getSafeSession, clearSafeSessionCache, getInternalToken, setInternalToken } from './supabase'
+import { MOCK_MODE } from '../mock/config'
+import { mockAdapter } from '../mock/api'
 
 let tempToken: string | null = null
 
@@ -16,6 +18,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Demo mode: answer every request in the browser instead of hitting the API
+  ...(MOCK_MODE ? { adapter: mockAdapter } : {}),
 })
 
 // Request interceptor — attach auth token

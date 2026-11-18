@@ -1,9 +1,11 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { MOCK_MODE } from '../mock/config'
+import { createMockSupabase } from '../mock/supabaseClient'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!MOCK_MODE && (!supabaseUrl || !supabaseAnonKey)) {
   console.warn(
     'Supabase URL or Anon Key is missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.'
   )
@@ -18,6 +20,12 @@ function getOrCreateClient(): SupabaseClient {
   // Check if a client already exists on the window object (survives HMR)
   if ((window as any)[GLOBAL_KEY]) {
     return (window as any)[GLOBAL_KEY]
+  }
+
+  if (MOCK_MODE) {
+    const mock = createMockSupabase() as unknown as SupabaseClient
+    ;(window as any)[GLOBAL_KEY] = mock
+    return mock
   }
 
   const client = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '', {

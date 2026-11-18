@@ -3,6 +3,8 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff, ChevronLeft } from 'lucide-react'
 import { authService } from '../../services/authService'
 import { toast } from 'react-hot-toast'
+import { MOCK_MODE, DEMO_ACCOUNTS, DEMO_PASSWORD } from '../../mock/config'
+import { resetMockDb } from '../../mock/db'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -11,11 +13,15 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
+    signIn(email, password)
+  }
+
+  const signIn = async (loginEmail: string, loginPassword: string) => {
     setLoading(true)
     try {
-      const response = await authService.login(email, password)
+      const response = await authService.login(loginEmail, loginPassword)
       toast.success('Login successful!')
       
       const user = response.user
@@ -117,6 +123,40 @@ export default function Login() {
           )}
         </button>
       </form>
+
+      {MOCK_MODE && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold text-amber-800">Demo mode · test accounts</p>
+              <p className="text-[11px] font-semibold text-amber-700/80 mt-1">
+                Click an account to sign in. Password for all: <span className="font-mono">{DEMO_PASSWORD}</span>
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => { resetMockDb(); toast.success('Demo data reset') }}
+              className="shrink-0 text-[10px] font-bold text-amber-700 hover:text-amber-900 underline underline-offset-4"
+            >
+              Reset data
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {DEMO_ACCOUNTS.map(acc => (
+              <button
+                key={acc.email}
+                type="button"
+                disabled={loading}
+                onClick={() => { setEmail(acc.email); setPassword(DEMO_PASSWORD); signIn(acc.email, DEMO_PASSWORD) }}
+                className="text-left rounded-xl border border-amber-200 bg-white px-4 py-3 hover:border-primary-500 hover:shadow-sm transition-all disabled:opacity-50"
+              >
+                <span className="block text-xs font-bold text-secondary-900">{acc.label}</span>
+                <span className="block text-[10px] font-semibold text-slate-400 truncate">{acc.email}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="pt-12 border-t border-slate-50 text-center">
         <p className="text-[11px] font-bold text-slate-300 leading-none">
